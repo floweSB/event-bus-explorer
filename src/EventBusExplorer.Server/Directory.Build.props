@@ -1,0 +1,11 @@
+<Project>
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Company>Flowe</Company>
+        <Authors>Flowe</Authors>
+    </PropertyGroup>
+
+</Project>
