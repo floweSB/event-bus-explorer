@@ -1,0 +1,16 @@
+<Project>
+
+  <PropertyGroup>
+    <Company>Flowe</Company>
+    <Authors>Augmented Intelligence</Authors>
+    <LangVersion>11</LangVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <EnableNETAnalyzer>True</EnableNETAnalyzer>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>EventBusExplorer.Server.Infrastructure.RabbitMQ</AssemblyName>
+    <RootNamespace>EventBusExplorer.Server.Infrastructure.RabbitMQ</RootNamespace>
+  </PropertyGroup>
+
+</Project>

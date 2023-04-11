@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>EventBusExplorer.Server.Application</AssemblyName>
+    <RootNamespace>EventBusExplorer.Server.Application</RootNamespace>
+  </PropertyGroup>
+
+</Project>
