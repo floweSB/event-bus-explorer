@@ -2,13 +2,13 @@ namespace EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
 
 public interface IServiceBrokerQueueService
 {
-    Task<Queue> CreateAsync(string name);
+    Task<Queue> CreateAsync(string name, CancellationToken cancellationToken = default);
 
-    Task<IList<Queue>> GetAsync();
+    Task<IList<Queue>> GetAsync(CancellationToken cancellationToken = default);
 
-    Task<Queue> GetAsync(string name);
+    Task<Queue> GetAsync(string name, CancellationToken cancellationToken = default);
 
-    Task DeleteAsync(string name);
+    Task DeleteAsync(string name, CancellationToken cancellationToken = default);
 }
 
 public class Queue
