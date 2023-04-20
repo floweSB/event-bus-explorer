@@ -1,10 +1,10 @@
 using Azure.Messaging.ServiceBus.Administration;
-using EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
+using AppAbs = EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
 using Azure;
 
 namespace EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 
-internal class AzureServiceBusService : IServiceBrokerQueueService
+internal class AzureServiceBusService : AppAbs.IServiceBrokerQueueService
 {
     private readonly ServiceBusAdministrationClient _adminClient;
 
@@ -14,10 +14,10 @@ internal class AzureServiceBusService : IServiceBrokerQueueService
         _adminClient = adminClient;
     }
 
-    public async Task<Queue> CreateAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<AppAbs.CreateQueueResponse> CreateAsync(string? name, CancellationToken cancellationToken = default)
     {
         QueueProperties queueProperties = await _adminClient.CreateQueueAsync(name, cancellationToken);
-        Queue queue = new Queue(queueProperties.Name);
+        AppAbs.CreateQueueResponse queue = new(queueProperties.Name);
         return queue;
     }
 
@@ -26,21 +26,22 @@ internal class AzureServiceBusService : IServiceBrokerQueueService
         await _adminClient.DeleteQueueAsync(name, cancellationToken);
     }
 
-    public async Task<IList<Queue>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<AppAbs.GetQueuesResponse> GetAsync(CancellationToken cancellationToken = default)
     {
-        IList<Queue> queues = new List<Queue>();
+        List<AppAbs.GetQueuesResponseItem> results = new();
         AsyncPageable<QueueProperties> queuesProperties = _adminClient.GetQueuesAsync(cancellationToken);
         await foreach (QueueProperties queueProperties in queuesProperties)
         {
-            queues.Add(new Queue(queueProperties.Name));
+            results.Add(new AppAbs.GetQueuesResponseItem(queueProperties.Name));
         }
-        return queues;
+
+        return new AppAbs.GetQueuesResponse(results);
     }
 
-    public async Task<Queue> GetAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<AppAbs.GetQueueResponse> GetAsync(string name, CancellationToken cancellationToken = default)
     {
         QueueProperties queueProperties = await _adminClient.GetQueueAsync(name, cancellationToken);
-        Queue queue = new Queue(queueProperties.Name);
+        AppAbs.GetQueueResponse queue = new(queueProperties.Name);
         return queue;
     }
 }
