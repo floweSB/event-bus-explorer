@@ -6,4 +6,4 @@ public record GetQueueResponse(string Name);
 
 public record GetQueuesResponseItem(string Name);
 
-public record GetQueuesResponse(List<GetQueuesResponseItem> Items);
+public record GetQueuesResponse(IList<string> Names);

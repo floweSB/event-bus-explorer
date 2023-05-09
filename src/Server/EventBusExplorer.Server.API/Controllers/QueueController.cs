@@ -1,5 +1,5 @@
 using System.Net.Mime;
-using AppInfra = EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
+using EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventBusExplorer.Server.API.Controllers;
@@ -10,9 +10,9 @@ namespace EventBusExplorer.Server.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class QueuesController : ControllerBase
 {
-    private readonly AppInfra.IServiceBrokerQueueService _queueService;
+    private readonly IServiceBrokerQueueService _queueService;
 
-    public QueuesController(AppInfra.IServiceBrokerQueueService queueService)
+    public QueuesController(IServiceBrokerQueueService queueService)
     {
         _queueService = queueService;
     }
@@ -20,8 +20,8 @@ public class QueuesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAsync()
     {
-        AppInfra.GetQueuesResponse queues = await _queueService.GetAsync();
-        GetQueuesResponse response = new(queues.Items.Select(x => new GetQueuesResponseItem(x.Name)).ToList());
+        IList<string> queueNames = await _queueService.GetAsync();
+        GetQueuesResponse response = new(queueNames);
 
         return Ok(response);
     }
@@ -29,8 +29,8 @@ public class QueuesController : ControllerBase
     [HttpGet("{name}")]
     public async Task<IActionResult> GetAsync([FromRoute] string name)
     {
-        AppInfra.GetQueueResponse queue = await _queueService.GetAsync(name);
-        GetQueueResponse response = new(queue.Name);
+        string queueName = await _queueService.GetAsync(name);
+        GetQueueResponse response = new(queueName);
         return Ok(response);
     }
 
@@ -38,9 +38,9 @@ public class QueuesController : ControllerBase
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateQueueRequest createRequest)
     {
-        AppInfra.CreateQueueResponse q = await _queueService.CreateAsync(createRequest.Name);
-        CreateQueueResponse q1 = new(q.Name);
-        return Ok(q1);
+        string queueName = await _queueService.CreateAsync(createRequest.Name);
+        CreateQueueResponse queueResponse = new(queueName);
+        return Ok(queueResponse);
     }
 
     [HttpDelete("{name}")]
