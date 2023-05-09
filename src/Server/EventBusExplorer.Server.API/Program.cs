@@ -13,24 +13,6 @@ builder.Services.AddMvc();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    //TODO: set below info
-    // OpenApiContact contact = new()
-    // {
-    //     // Name = _configuration["SwaggerApiInfo:Name"],
-    //     // Email = _configuration["SwaggerApiInfo:Email"],
-    //     // Url = new Uri(_configuration["SwaggerApiInfo:Uri"])
-    //     Name = ""
-    // };
-
-    // //TODO: set below infos
-    // options.SwaggerDoc(
-    //     "",
-    //     new OpenApiInfo
-    //     {
-    //         Title = "",
-    //         Contact = contact
-    //     });
-
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
