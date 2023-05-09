@@ -1,3 +1,3 @@
-namespace EventBusExplorer.Server.API;
+﻿namespace EventBusExplorer.Server.API;
 
 public record CreateQueueRequest(string? Name);

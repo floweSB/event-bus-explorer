@@ -1,4 +1,4 @@
-namespace EventBusExplorer.Server.API;
+﻿namespace EventBusExplorer.Server.API;
 
 public record CreateQueueResponse(string Name);
 

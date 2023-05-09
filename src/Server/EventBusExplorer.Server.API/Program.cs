@@ -1,7 +1,7 @@
-using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
-using EventBusExplorer.Server.Application;
-// using Microsoft.OpenApi.Models;
+﻿// using Microsoft.OpenApi.Models;
 using System.Reflection;
+using EventBusExplorer.Server.Application;
+using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
