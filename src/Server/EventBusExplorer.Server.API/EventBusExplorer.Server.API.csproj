@@ -1,9 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <AssemblyName>EventBusExplorer.Server.API</AssemblyName>
     <RootNamespace>EventBusExplorer.Server.API</RootNamespace>
+    <UserSecretsId>910a84aa-22ea-428d-94c4-ba28e6e7c28e</UserSecretsId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference
+      Include="../EventBusExplorer.Server.Application/EventBusExplorer.Server.Application.csproj" />
+    <ProjectReference
+      Include="../EventBusExplorer.Server.Infrastructure.AzureServiceBus/EventBusExplorer.Server.Infrastructure.AzureServiceBus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
 
 </Project>
