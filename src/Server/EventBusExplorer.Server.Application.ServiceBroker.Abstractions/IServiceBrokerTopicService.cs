@@ -1,6 +1,6 @@
 ﻿namespace EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
-public interface IServiceBrokerQueuesService
+public interface IServiceBrokerTopicsService
 {
     Task<string> CreateAsync(string? name, CancellationToken cancellationToken = default);
 

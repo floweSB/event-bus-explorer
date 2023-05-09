@@ -1,14 +1,14 @@
+﻿using Azure;
 using Azure.Messaging.ServiceBus.Administration;
-using EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
-using Azure;
+using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
 namespace EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 
-internal class AzureServiceBusService : IServiceBrokerQueueService
+internal class ServiceBusQueuesService : IServiceBrokerQueuesService
 {
     private readonly ServiceBusAdministrationClient _adminClient;
 
-    public AzureServiceBusService(
+    public ServiceBusQueuesService(
         ServiceBusAdministrationClient adminClient)
     {
         _adminClient = adminClient;

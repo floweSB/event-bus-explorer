@@ -1,5 +1,5 @@
 ﻿using System.Net.Mime;
-using EventBusExplorer.Server.Application.ServiceBusBroker.Abstraction;
+using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventBusExplorer.Server.API.Controllers;
@@ -10,9 +10,9 @@ namespace EventBusExplorer.Server.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class QueuesController : ControllerBase
 {
-    private readonly IServiceBrokerQueueService _queueService;
+    private readonly IServiceBrokerQueuesService _queueService;
 
-    public QueuesController(IServiceBrokerQueueService queueService)
+    public QueuesController(IServiceBrokerQueuesService queueService)
     {
         _queueService = queueService;
     }
