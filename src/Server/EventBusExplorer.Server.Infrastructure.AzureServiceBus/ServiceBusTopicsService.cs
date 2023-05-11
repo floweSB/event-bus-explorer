@@ -42,4 +42,33 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         TopicProperties topicProperties = await _adminClient.GetTopicAsync(name, cancellationToken);
         return topicProperties.Name;
     }
+
+    public async Task<IList<string>> GetSubscriptionsAsync(string topicName, CancellationToken cancellationToken = default)
+    {
+        List<string> subscriptions = new();
+        AsyncPageable<SubscriptionProperties> subProperties = _adminClient.GetSubscriptionsAsync(topicName, cancellationToken);
+        await foreach (SubscriptionProperties subscriptionProperties in subProperties)
+        {
+            subscriptions.Add(subscriptionProperties.SubscriptionName);
+        }
+
+        return subscriptions;
+    }
+
+    public async Task<string> GetSubscriptionAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default)
+    {
+        SubscriptionProperties subProperties = await _adminClient.GetSubscriptionAsync(topicName, subscriptionName, cancellationToken);
+        return subProperties.SubscriptionName;
+    }
+
+    public async Task<string> CreateSubscriptionAsync(string topicName, string? name, CancellationToken cancellationToken = default)
+    {
+        SubscriptionProperties subscriptionProperties = await _adminClient.CreateSubscriptionAsync(topicName, name, cancellationToken);
+        return subscriptionProperties.SubscriptionName;
+    }
+
+    public async Task DeleteSubscriptionAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default)
+    {
+        await _adminClient.DeleteSubscriptionAsync(topicName, subscriptionName, cancellationToken);
+    }
 }

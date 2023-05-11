@@ -21,7 +21,7 @@ public class TopicsController : ControllerBase
     public async Task<IActionResult> GetAsync()
     {
         IList<string> queueNames = await _topicService.GetAsync();
-        GetQueuesResponse response = new(queueNames);
+        GetTopicsResponse response = new(queueNames);
 
         return Ok(response);
     }
@@ -30,16 +30,16 @@ public class TopicsController : ControllerBase
     public async Task<IActionResult> GetAsync([FromRoute] string name)
     {
         string queueName = await _topicService.GetAsync(name);
-        GetQueueResponse response = new(queueName);
+        GetTopicResponse response = new(queueName);
         return Ok(response);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
-        [FromBody] CreateQueueRequest createRequest)
+        [FromBody] CreateTopicRequest createRequest)
     {
         string queueName = await _topicService.CreateAsync(createRequest.Name);
-        CreateQueueResponse queueResponse = new(queueName);
+        CreateTopicResponse queueResponse = new(queueName);
         return Ok(queueResponse);
     }
 
@@ -48,6 +48,41 @@ public class TopicsController : ControllerBase
         [FromRoute] string name)
     {
         await _topicService.DeleteAsync(name);
+        return NoContent();
+    }
+
+    [HttpGet("{topicName}/subscriptions")]
+    public async Task<IActionResult> GetSubscriptionsAsync(string topicName)
+    {
+        IList<string> subscriptionNames = await _topicService.GetSubscriptionsAsync(topicName);
+        GetTopicSubscriptionsResponse response = new(subscriptionNames);
+        return Ok(response);
+    }
+
+    [HttpGet("{topicName}/subscriptions/{subscriptionName}")]
+    public async Task<IActionResult> GetAsync([FromRoute] string topicName, [FromRoute] string subscriptionName)
+    {
+        string name = await _topicService.GetSubscriptionAsync(topicName, subscriptionName);
+        GetTopicSubscriptionResponse response = new(name);
+        return Ok(response);
+    }
+
+    [HttpPost("{topicName}/subscriptions")]
+    public async Task<IActionResult> CreateSubscriptionAsync(
+        [FromRoute] string topicName,
+        [FromBody] CreateSubscriptionRequest createRequest)
+    {
+        string subscriptionName = await _topicService.CreateSubscriptionAsync(topicName, createRequest.Name);
+        CreateSubscriptionResponse response = new(subscriptionName);
+        return Ok(response);
+    }
+
+    [HttpDelete("{topicName}/subscriptions/{subscriptionName}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] string topicName,
+        [FromRoute] string subscriptionName)
+    {
+        await _topicService.DeleteSubscriptionAsync(topicName, subscriptionName);
         return NoContent();
     }
 }
