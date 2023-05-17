@@ -78,7 +78,7 @@ public class TopicsController : ControllerBase
     }
 
     [HttpDelete("{topicName}/subscriptions/{subscriptionName}")]
-    public async Task<IActionResult> DeleteAsync(
+    public async Task<IActionResult> DeleteSubscriptionAsync(
         [FromRoute] string topicName,
         [FromRoute] string subscriptionName)
     {
