@@ -60,7 +60,7 @@ public class TopicsController : ControllerBase
     }
 
     [HttpGet("{topicName}/subscriptions/{subscriptionName}")]
-    public async Task<IActionResult> GetAsync([FromRoute] string topicName, [FromRoute] string subscriptionName)
+    public async Task<IActionResult> GetSubscriptionAsync([FromRoute] string topicName, [FromRoute] string subscriptionName)
     {
         string name = await _topicService.GetSubscriptionAsync(topicName, subscriptionName);
         GetTopicSubscriptionResponse response = new(name);
