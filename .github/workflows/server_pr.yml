@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - src/Server/*
+      - src/Server/**
       - .github/workflows/server_pr.yml
 
 jobs:
