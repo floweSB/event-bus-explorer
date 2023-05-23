@@ -27,7 +27,7 @@ RUN dotnet publish "EventBusExplorer.Server.API.csproj" \
   --no-self-contained \
   --output /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim AS final
 
 WORKDIR /app
 
