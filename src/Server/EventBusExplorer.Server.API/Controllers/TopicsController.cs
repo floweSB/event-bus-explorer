@@ -18,36 +18,36 @@ public class TopicsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAsync()
+    public async Task<IActionResult> GetTopicsAsync()
     {
-        IList<string> queueNames = await _topicService.GetAsync();
+        IList<string> queueNames = await _topicService.GetTopicsAsync();
         GetTopicsResponse response = new(queueNames);
 
         return Ok(response);
     }
 
     [HttpGet("{name}")]
-    public async Task<IActionResult> GetAsync([FromRoute] string name)
+    public async Task<IActionResult> GetTopicAsync([FromRoute] string name)
     {
-        string queueName = await _topicService.GetAsync(name);
+        string queueName = await _topicService.GetTopicAsync(name);
         GetTopicResponse response = new(queueName);
         return Ok(response);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(
+    public async Task<IActionResult> CreateTopicAsync(
         [FromBody] CreateTopicRequest createRequest)
     {
-        string queueName = await _topicService.CreateAsync(createRequest.Name);
+        string queueName = await _topicService.CreateTopicAsync(createRequest.Name);
         CreateTopicResponse queueResponse = new(queueName);
         return Ok(queueResponse);
     }
 
     [HttpDelete("{name}")]
-    public async Task<IActionResult> DeleteAsync(
+    public async Task<IActionResult> DeleteTopicAsync(
         [FromRoute] string name)
     {
-        await _topicService.DeleteAsync(name);
+        await _topicService.DeleteTopicAsync(name);
         return NoContent();
     }
 

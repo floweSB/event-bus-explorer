@@ -14,18 +14,18 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         _adminClient = adminClient;
     }
 
-    public async Task<string> CreateAsync(string? name, CancellationToken cancellationToken = default)
+    public async Task<string> CreateTopicAsync(string? name, CancellationToken cancellationToken = default)
     {
         TopicProperties topicProperties = await _adminClient.CreateTopicAsync(name, cancellationToken);
         return topicProperties.Name;
     }
 
-    public async Task DeleteAsync(string name, CancellationToken cancellationToken = default)
+    public async Task DeleteTopicAsync(string name, CancellationToken cancellationToken = default)
     {
         await _adminClient.DeleteTopicAsync(name, cancellationToken);
     }
 
-    public async Task<IList<string>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<IList<string>> GetTopicsAsync(CancellationToken cancellationToken = default)
     {
         List<string> topics = new();
         AsyncPageable<TopicProperties> topicsProperties = _adminClient.GetTopicsAsync(cancellationToken);
@@ -37,7 +37,7 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         return topics;
     }
 
-    public async Task<string> GetAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<string> GetTopicAsync(string name, CancellationToken cancellationToken = default)
     {
         TopicProperties topicProperties = await _adminClient.GetTopicAsync(name, cancellationToken);
         return topicProperties.Name;
