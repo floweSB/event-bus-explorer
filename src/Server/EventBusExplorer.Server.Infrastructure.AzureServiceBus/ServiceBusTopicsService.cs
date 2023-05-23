@@ -14,18 +14,18 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         _adminClient = adminClient;
     }
 
-    public async Task<string> CreateAsync(string? name, CancellationToken cancellationToken = default)
+    public async Task<string> CreateTopicAsync(string? name, CancellationToken cancellationToken = default)
     {
         TopicProperties topicProperties = await _adminClient.CreateTopicAsync(name, cancellationToken);
         return topicProperties.Name;
     }
 
-    public async Task DeleteAsync(string name, CancellationToken cancellationToken = default)
+    public async Task DeleteTopicAsync(string name, CancellationToken cancellationToken = default)
     {
         await _adminClient.DeleteTopicAsync(name, cancellationToken);
     }
 
-    public async Task<IList<string>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<IList<string>> GetTopicsAsync(CancellationToken cancellationToken = default)
     {
         List<string> topics = new();
         AsyncPageable<TopicProperties> topicsProperties = _adminClient.GetTopicsAsync(cancellationToken);
@@ -37,9 +37,38 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         return topics;
     }
 
-    public async Task<string> GetAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<string> GetTopicAsync(string name, CancellationToken cancellationToken = default)
     {
         TopicProperties topicProperties = await _adminClient.GetTopicAsync(name, cancellationToken);
         return topicProperties.Name;
+    }
+
+    public async Task<IList<string>> GetSubscriptionsAsync(string topicName, CancellationToken cancellationToken = default)
+    {
+        List<string> subscriptions = new();
+        AsyncPageable<SubscriptionProperties> subProperties = _adminClient.GetSubscriptionsAsync(topicName, cancellationToken);
+        await foreach (SubscriptionProperties subscriptionProperties in subProperties)
+        {
+            subscriptions.Add(subscriptionProperties.SubscriptionName);
+        }
+
+        return subscriptions;
+    }
+
+    public async Task<string> GetSubscriptionAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default)
+    {
+        SubscriptionProperties subProperties = await _adminClient.GetSubscriptionAsync(topicName, subscriptionName, cancellationToken);
+        return subProperties.SubscriptionName;
+    }
+
+    public async Task<string> CreateSubscriptionAsync(string topicName, string? name, CancellationToken cancellationToken = default)
+    {
+        SubscriptionProperties subscriptionProperties = await _adminClient.CreateSubscriptionAsync(topicName, name, cancellationToken);
+        return subscriptionProperties.SubscriptionName;
+    }
+
+    public async Task DeleteSubscriptionAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default)
+    {
+        await _adminClient.DeleteSubscriptionAsync(topicName, subscriptionName, cancellationToken);
     }
 }
