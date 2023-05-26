@@ -11,6 +11,12 @@ builder.Services.AddAutoMapper(typeof(Program), typeof(Placeholder));
 
 builder.Services.AddMvc();
 
+builder.Services.AddRouting(opt =>
+{
+    opt.LowercaseUrls = true;
+    opt.LowercaseQueryStrings = true;
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
