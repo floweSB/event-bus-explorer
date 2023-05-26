@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventBusExplorer.Server.API.Controllers;
 
+/// <summary>
+/// API group to manage queues
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 [Consumes(MediaTypeNames.Application.Json)]
@@ -17,6 +20,11 @@ public class QueuesController : ControllerBase
         _queueService = queueService;
     }
 
+    /// <summary>
+    /// Get list of queues
+    /// </summary>
+    /// <response code="200">Returns the list of queue names</response>
+    [ProducesResponseType(typeof(GetQueuesResponse), StatusCodes.Status200OK)]
     [HttpGet]
     public async Task<IActionResult> GetAsync()
     {
@@ -26,6 +34,12 @@ public class QueuesController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Get details of the given queue
+    /// </summary>
+    /// <param name="name">Queue name</param>
+    /// <response code="200">Return details of the given queue</response>
+    [ProducesResponseType(typeof(GetQueueResponse), StatusCodes.Status200OK)]
     [HttpGet("{name}")]
     public async Task<IActionResult> GetAsync([FromRoute] string name)
     {
@@ -34,6 +48,12 @@ public class QueuesController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Create a new queue
+    /// </summary>
+    /// <param name="createRequest">Properties of the new queue</param>
+    /// <response code="200">Location of the created queue</response>
+    [ProducesResponseType(typeof(CreateQueueResponse), StatusCodes.Status200OK)]
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateQueueRequest createRequest)
@@ -43,6 +63,12 @@ public class QueuesController : ControllerBase
         return Ok(queueResponse);
     }
 
+    /// <summary>
+    /// Delete the specified queue
+    /// </summary>
+    /// <param name="name">Name of the queue to delete</param>
+    /// <response code="204">No content</response>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpDelete("{name}")]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] string name)

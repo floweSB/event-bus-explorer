@@ -1,7 +1,7 @@
-﻿// using Microsoft.OpenApi.Models;
-using System.Reflection;
+﻿using System.Reflection;
 using EventBusExplorer.Server.Application;
 using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
+using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +11,31 @@ builder.Services.AddAutoMapper(typeof(Program), typeof(Placeholder));
 
 builder.Services.AddMvc();
 
+builder.Services.AddRouting(opt =>
+{
+    opt.LowercaseUrls = true;
+    opt.LowercaseQueryStrings = true;
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
+    ConfigurationManager config = builder.Configuration;
+
+    var contact = new OpenApiContact
+    {
+        Name = config["SwaggerApiInfo:Name"],
+        Url = new Uri(config["SwaggerApiInfo:Uri"]!),
+    };
+
+    options.SwaggerDoc(
+        "v1",
+        new OpenApiInfo
+        {
+            Title = $"{config["SwaggerApiInfo:Title"]}",
+            Version = "v1",
+            Contact = contact
+        });
+
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
