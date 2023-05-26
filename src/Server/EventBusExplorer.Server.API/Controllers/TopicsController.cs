@@ -23,12 +23,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Get list of topics
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     GET: /topics
-    /// 
-    /// </remarks>
     /// <response code="200">Returns the list of topic names</response>
     [ProducesResponseType(typeof(GetTopicsResponse), StatusCodes.Status200OK)]
     [HttpGet]
@@ -43,12 +37,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Get details of the given topic
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     GET: /topics/{name}
-    /// 
-    /// </remarks>
     /// <param name="name">Topic name</param>
     /// <response code="200">Return details of the given queue</response>
     [ProducesResponseType(typeof(GetTopicResponse), StatusCodes.Status200OK)]
@@ -63,12 +51,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Create a new topic
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     POST: /topics
-    /// 
-    /// </remarks>
     /// <param name="createRequest">Properties of the new topic</param>
     /// <response code="200">Location of the created topic</response>
     [ProducesResponseType(typeof(CreateTopicResponse), StatusCodes.Status200OK)]
@@ -84,12 +66,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Delete the specified topic
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     DELETE: /topics/{name}
-    /// 
-    /// </remarks>
     /// <param name="name">Name of the topic to delete</param>
     /// <response code="204">No content</response>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -104,12 +80,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Get subscriptions of the given topic
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     GET: /topics/{topicName}/subscriptions
-    /// 
-    /// </remarks>
     /// <param name="topicName">Topic to retrieve subscriptions</param>
     /// <response code="200">List of subscriptions</response>
     [ProducesResponseType(typeof(GetTopicSubscriptionsResponse), StatusCodes.Status200OK)]
@@ -124,12 +94,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Get details of the given subscription
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     GET: /topics/{topicName}/subscriptions/{subscriptionName}
-    /// 
-    /// </remarks>
     /// <param name="topicName">Topic name</param>
     /// <param name="subscriptionName">Subscription name</param>
     /// <returns></returns>
@@ -144,12 +108,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Create a new subscription in the specified topic
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     POST: /topics/{topicName}/subscriptions
-    /// 
-    /// </remarks>
     /// <param name="topicName">Topic name</param>
     /// <param name="createRequest">Properties of the subscription to create</param>
     /// <response code="200">Location of the created topic</response>
@@ -167,12 +125,6 @@ public class TopicsController : ControllerBase
     /// <summary>
     /// Delete the specified subscription in the given topic
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     DELETE: /topics/{topicName}/subscriptions/{subscriptionName}
-    /// 
-    /// </remarks>
     /// <param name="topicName">Name of the topic</param>
     /// <param name="subscriptionName">Name of the subscription to delete</param>
     /// <response code="204">No content</response>

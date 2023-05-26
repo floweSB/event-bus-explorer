@@ -23,12 +23,6 @@ public class QueuesController : ControllerBase
     /// <summary>
     /// Get lsit of queues
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     GET: /queues
-    /// 
-    /// </remarks>
     /// <response code="200">Returns the list of queue names</response>
     [ProducesResponseType(typeof(GetQueuesResponse), StatusCodes.Status200OK)]
     [HttpGet]
@@ -43,12 +37,6 @@ public class QueuesController : ControllerBase
     /// <summary>
     /// Get details of the given queue
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     GET: /queues/{name}
-    /// 
-    /// </remarks>
     /// <param name="name">Queue name</param>
     /// <response code="200">Return details of the given queue</response>
     [ProducesResponseType(typeof(GetQueueResponse), StatusCodes.Status200OK)]
@@ -63,12 +51,6 @@ public class QueuesController : ControllerBase
     /// <summary>
     /// Create a new queue
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     POST: /queues
-    /// 
-    /// </remarks>
     /// <param name="createRequest">Properties of the new queue</param>
     /// <response code="200">Location of the created queue</response>
     [ProducesResponseType(typeof(CreateQueueResponse), StatusCodes.Status200OK)]
@@ -84,12 +66,6 @@ public class QueuesController : ControllerBase
     /// <summary>
     /// Delete the specified queue
     /// </summary>
-    /// <remarks>
-    /// Sample request:
-    /// 
-    ///     DELETE: /queues
-    /// 
-    /// </remarks>
     /// <param name="name">Name of the queue to delete</param>
     /// <response code="204">No content</response>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
