@@ -21,7 +21,7 @@ public class QueuesController : ControllerBase
     }
 
     /// <summary>
-    /// Get lsit of queues
+    /// Get list of queues
     /// </summary>
     /// <response code="200">Returns the list of queue names</response>
     [ProducesResponseType(typeof(GetQueuesResponse), StatusCodes.Status200OK)]
