@@ -1,5 +1,8 @@
 ﻿namespace EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
+/// <summary>
+/// Access registered event bus to manage queues
+/// </summary>
 public interface IServiceBrokerQueuesService
 {
     /// <summary>

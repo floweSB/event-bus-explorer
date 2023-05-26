@@ -1,5 +1,8 @@
 ﻿namespace EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
+/// <summary>
+/// Access registered event bus to manage topics and subscriptions
+/// </summary>
 public interface IServiceBrokerTopicsService
 {
     /// <summary>
