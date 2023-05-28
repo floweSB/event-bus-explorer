@@ -35,4 +35,16 @@ public interface IServiceBrokerQueuesService
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A task</returns>
     Task DeleteAsync(string name, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Peek messages from given queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to peek</param>
+    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <returns>A list of messages</returns>
+    Task<MessageListModel> PeekMessagesAsync(
+        string queueName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default);
 }

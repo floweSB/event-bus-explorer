@@ -1,4 +1,6 @@
-﻿using Azure;
+﻿using System.Text;
+using Azure;
+using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
@@ -7,11 +9,17 @@ namespace EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 internal class ServiceBusQueuesService : IServiceBrokerQueuesService
 {
     private readonly ServiceBusAdministrationClient _adminClient;
+    private readonly ServiceBusClient _client;
 
     public ServiceBusQueuesService(
+        ServiceBusClient client,
         ServiceBusAdministrationClient adminClient)
     {
-        _adminClient = adminClient;
+        _client = client ??
+            throw new ArgumentNullException(nameof(client));
+
+        _adminClient = adminClient ??
+            throw new ArgumentNullException(nameof(adminClient));
     }
 
     public async Task<string> CreateAsync(string? name, CancellationToken cancellationToken = default)
@@ -42,4 +50,27 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
         QueueProperties queueProperties = await _adminClient.GetQueueAsync(name, cancellationToken);
         return queueProperties.Name;
     }
+
+    public async Task<MessageListModel> PeekMessagesAsync(
+        string queueName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
+
+        var receiver = GetReceiver(queueName);
+
+        IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.PeekMessagesAsync(
+            MAX_COUNT,
+            fromSequenceNumber,
+            cancellationToken: cancellationToken);
+
+        var toReturn = messages
+            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, Encoding.UTF8.GetString(m.Body)));
+
+        return new MessageListModel(toReturn);
+    }
+
+    private ServiceBusReceiver GetReceiver(string name) =>
+        _client.CreateReceiver(name);
 }
