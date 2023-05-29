@@ -2,9 +2,9 @@
 
 namespace EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 
-internal class RabbitMqTopicsService : IServiceBrokerTopicsService
+internal class RabbitMQTopicsService : IServiceBrokerTopicsService
 {
-    public RabbitMqTopicsService()
+    public RabbitMQTopicsService()
     {
     }
 

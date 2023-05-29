@@ -2,11 +2,11 @@ using System.Net.Http.Json;
 
 namespace EventBusExplorer.Server.Infrastructure.RabbitMq;
 
-public class RabbitMqAdministrationClient
+public class RabbitMQAdministrationClient
 {
     private readonly HttpClient _httpClient;
 
-    public RabbitMqAdministrationClient(HttpClient? httpClient)
+    public RabbitMQAdministrationClient(HttpClient? httpClient)
     {
         _httpClient = httpClient!;
     }
@@ -26,7 +26,7 @@ public class RabbitMqAdministrationClient
         //TODO: consider centralize code
         if (!response.IsSuccessStatusCode)
         {
-            throw new HttpRequestException($"PUT {path} -> {response.StatusCode}");
+            throw new HttpRequestException($"PUT {path} -> {response.StatusCode}. Payload: {response.Content.ReadAsStringAsync()}");
         }
 
         CreateTopicResponse? payload = await response.Content.ReadFromJsonAsync<CreateTopicResponse>(
