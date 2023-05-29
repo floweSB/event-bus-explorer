@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 
-namespace EventBusExplorer.Server.Infrastructure.RabbitMq;
+namespace EventBusExplorer.Server.Infrastructure.RabbitMQ;
 
 public class RabbitMQAdministrationClient
 {
@@ -11,7 +11,47 @@ public class RabbitMQAdministrationClient
         _httpClient = httpClient!;
     }
 
-    public async Task<string> CreateTopicAsync(
+    internal async Task<ExchangeTopic> CreateTopicAsync(
+        string? name,
+        string virtualHost = "/",
+        CancellationToken cancellationToken = default)
+    {
+        // TODO: centralize paths
+        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}/" +
+            $"{Uri.EscapeDataString(name)}";
+
+        ExchangeTopic requestTopic = new(
+            Name: name ?? string.Empty,
+            Durable: true,
+            AutoDelete: false);
+
+        HttpResponseMessage response = await _httpClient.PutAsJsonAsync(path, requestTopic, cancellationToken: cancellationToken);
+
+        await ThrowExceptionIfUnsuccessfulAsync(response, "PUT", path);
+
+        ExchangeTopic? responseTopic = await response.Content.ReadFromJsonAsync<ExchangeTopic>(
+            cancellationToken: cancellationToken);
+
+        return responseTopic!;
+    }
+
+    internal async Task<IList<ExchangeTopic>> GetTopicsAsync(
+        string virtualHost = "/",
+        CancellationToken cancellationToken = default)
+    {
+        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}";
+
+        HttpResponseMessage response = await _httpClient.GetAsync(path, cancellationToken: cancellationToken);
+
+        await ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
+
+        List<ExchangeTopic>? payload = await response.Content.ReadFromJsonAsync<List<ExchangeTopic>>(
+            cancellationToken: cancellationToken);
+
+        return payload!;
+    }
+
+    internal async Task<ExchangeTopic> GetTopicAsync(
         string name,
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
@@ -19,34 +59,47 @@ public class RabbitMQAdministrationClient
         string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}/" +
             $"{Uri.EscapeDataString(name)}";
 
-        CreateTopicRequest request = new(name);
-
-        HttpResponseMessage response = await _httpClient.PutAsJsonAsync(path, request, cancellationToken: cancellationToken);
-
-        //TODO: consider centralize code
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new HttpRequestException($"PUT {path} -> {response.StatusCode}. Payload: {response.Content.ReadAsStringAsync()}");
-        }
-
-        CreateTopicResponse? payload = await response.Content.ReadFromJsonAsync<CreateTopicResponse>(
+        HttpResponseMessage response = await _httpClient.GetAsync(
+            path,
             cancellationToken: cancellationToken);
 
-        return payload!.Name;
+        await ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
+
+        ExchangeTopic? topic = await response
+            .Content
+            .ReadFromJsonAsync<ExchangeTopic>(
+                cancellationToken: cancellationToken);
+
+        return topic!;
     }
 
-    public Task<string> GetTopicsAsync(string virtualHost = "/", CancellationToken cancellationToken = default)
+    internal async Task DeleteTopicAsync(
+        string name,
+        string virtualHost = "/",
+        CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}/" +
+            $"{Uri.EscapeDataString(name)}";
+
+        HttpResponseMessage response = await _httpClient.DeleteAsync(
+            path,
+            cancellationToken: cancellationToken);
+
+        await ThrowExceptionIfUnsuccessfulAsync(response, "DELETE", path);
     }
 
-    public Task<string> GetTopicAsync(string name, string virtualHost = "/", CancellationToken cancellationToken = default)
+    //TODO: find a way to centralize as a common utility
+    private static async Task ThrowExceptionIfUnsuccessfulAsync(
+        HttpResponseMessage response,
+        string httpVerb,
+        string path)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteTopicAsync(string name, string virtualHost = "/", CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
+        if (!response.IsSuccessStatusCode)
+        {
+            string payload = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(
+                $"{httpVerb} {path} -> {response.StatusCode}. " +
+                $"Payload: {payload}");
+        }
     }
 }

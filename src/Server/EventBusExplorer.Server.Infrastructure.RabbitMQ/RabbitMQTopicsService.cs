@@ -1,31 +1,47 @@
 ﻿using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
-namespace EventBusExplorer.Server.Infrastructure.AzureServiceBus;
+namespace EventBusExplorer.Server.Infrastructure.RabbitMQ;
 
-internal class RabbitMQTopicsService : IServiceBrokerTopicsService
+public class RabbitMQTopicsService : IServiceBrokerTopicsService
 {
-    public RabbitMQTopicsService()
+    private readonly RabbitMQAdministrationClient _adminClient;
+
+    public RabbitMQTopicsService(
+        RabbitMQAdministrationClient adminClient
+    )
     {
+        _adminClient = adminClient;
     }
 
-    public Task<string> CreateTopicAsync(string? name, CancellationToken cancellationToken = default)
+    public async Task<string> CreateTopicAsync(string? name, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        ExchangeTopic topic = await _adminClient.CreateTopicAsync(
+            name,
+            cancellationToken: cancellationToken);
+
+        return topic.Name;
     }
 
-    public Task<IList<string>> GetTopicsAsync(CancellationToken cancellationToken = default)
+    public async Task<IList<string>> GetTopicsAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        IList<ExchangeTopic> topics = await _adminClient.GetTopicsAsync(
+            cancellationToken: cancellationToken);
+
+        return topics.Select(x => x.Name).ToList();
     }
 
-    public Task<string> GetTopicAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<string> GetTopicAsync(string name, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        ExchangeTopic topic = await _adminClient.GetTopicAsync(
+            name,
+            cancellationToken: cancellationToken);
+
+        return topic.Name;
     }
 
-    public Task DeleteTopicAsync(string name, CancellationToken cancellationToken = default)
+    public async Task DeleteTopicAsync(string name, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _adminClient.DeleteTopicAsync(name, cancellationToken: cancellationToken);
     }
 
     public Task<IList<string>> GetSubscriptionsAsync(string topicName, CancellationToken cancellationToken = default)
