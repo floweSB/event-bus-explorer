@@ -11,7 +11,7 @@ public class RabbitMQAdministrationClient
         _httpClient = httpClient!;
     }
 
-    internal async Task<ExchangeTopic> CreateTopicAsync(
+    internal async Task CreateTopicAsync(
         string? name,
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
@@ -28,11 +28,6 @@ public class RabbitMQAdministrationClient
         HttpResponseMessage response = await _httpClient.PutAsJsonAsync(path, requestTopic, cancellationToken: cancellationToken);
 
         await ThrowExceptionIfUnsuccessfulAsync(response, "PUT", path);
-
-        ExchangeTopic? responseTopic = await response.Content.ReadFromJsonAsync<ExchangeTopic>(
-            cancellationToken: cancellationToken);
-
-        return responseTopic!;
     }
 
     internal async Task<IList<ExchangeTopic>> GetTopicsAsync(

@@ -15,11 +15,12 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
 
     public async Task<string> CreateTopicAsync(string? name, CancellationToken cancellationToken = default)
     {
-        ExchangeTopic topic = await _adminClient.CreateTopicAsync(
+        await _adminClient.CreateTopicAsync(
             name,
             cancellationToken: cancellationToken);
 
-        return topic.Name;
+        //TODO: remove the below bad trick: find out if there is a way to get another response instead of 204
+        return name!;
     }
 
     public async Task<IList<string>> GetTopicsAsync(CancellationToken cancellationToken = default)
