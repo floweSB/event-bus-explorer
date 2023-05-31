@@ -3,6 +3,7 @@ using Azure;
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
+using EventBusExplorer.Server.Infrastructure.AzureServiceBus.Helpers;
 
 namespace EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 
@@ -66,11 +67,37 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, Encoding.UTF8.GetString(m.Body)));
+            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+
+        return new MessageListModel(toReturn);
+    }
+
+    public async Task<MessageListModel> PeekDeadLetterMessagesAsync(
+        string queueName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
+
+        var receiver = GetDeadLetterReceiver(queueName);
+
+        IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.PeekMessagesAsync(
+            MAX_COUNT,
+            fromSequenceNumber,
+            cancellationToken: cancellationToken);
+
+        var toReturn = messages
+            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
         return new MessageListModel(toReturn);
     }
 
     private ServiceBusReceiver GetReceiver(string name) =>
         _client.CreateReceiver(name);
+
+    private ServiceBusReceiver GetDeadLetterReceiver(string name) =>
+        _client.CreateReceiver(name, new ServiceBusReceiverOptions
+        {
+            SubQueue = SubQueue.DeadLetter
+        });
 }

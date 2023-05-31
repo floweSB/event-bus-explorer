@@ -102,4 +102,30 @@ public class QueuesController : ControllerBase
 
         return Ok(new GetMessagesResponse(dtos));
     }
+
+    /// <summary>
+    /// Peek dead letter messages in queue
+    /// </summary>
+    /// <param name="queueName">Queue name</param>
+    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <response code="200">List of peeked messages</response>
+    [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
+    [HttpGet("{queueName}/messages/deadletter")]
+    public async Task<IActionResult> PeekDeadLetterMessagesAsync(
+        [FromRoute] string queueName,
+        [FromQuery] long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        var messages = await _queueService.PeekDeadLetterMessagesAsync(
+            queueName,
+            fromSequenceNumber,
+            cancellationToken);
+
+        var dtos = messages.Messages
+            .Select(m => new GetMessageResponse(m.SequenceNumber, m.Subject, m.Body))
+            .ToList();
+
+        return Ok(new GetMessagesResponse(dtos));
+    }
 }
