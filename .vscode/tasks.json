@@ -37,17 +37,5 @@
       ],
       "problemMatcher": "$msCompile"
     },
-    {
-      "label": "build-console",
-      "command": "dotnet",
-      "type": "shell",
-      "args": [
-        "build",
-        "${workspaceFolder}/src/Client/TestConsole/TestConsole.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
   ]
 }
