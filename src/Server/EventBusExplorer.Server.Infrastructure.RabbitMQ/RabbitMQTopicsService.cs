@@ -19,7 +19,10 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
             name,
             cancellationToken: cancellationToken);
 
-        //TODO: remove the below bad trick: find out if there is a way to get another response instead of 204
+        //
+        // Since exchange creation through management API does not return anything,
+        // It is assumed that if the request is successful then the exchange has been created.
+        //
         return name!;
     }
 

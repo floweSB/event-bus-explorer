@@ -17,7 +17,6 @@ public static class Bootstrapper
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        //TODO: define an interface for RabbitMQAdministrationClient
         services.AddHttpClient<RabbitMQAdministrationClient>(client =>
         {
             client.BaseAddress = configuration.GetValue<Uri>("RabbitMQ:Management:BaseUrl");

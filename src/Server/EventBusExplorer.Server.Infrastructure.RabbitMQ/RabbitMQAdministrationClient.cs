@@ -4,6 +4,8 @@ namespace EventBusExplorer.Server.Infrastructure.RabbitMQ;
 
 public class RabbitMQAdministrationClient
 {
+    private const string EXCHANGE_PATH = "/api/exchanges/";
+
     private readonly HttpClient _httpClient;
 
     public RabbitMQAdministrationClient(HttpClient? httpClient)
@@ -16,8 +18,10 @@ public class RabbitMQAdministrationClient
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
-        // TODO: centralize paths
-        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}/" +
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Creating Exchange with empty string is not currently supported.");
+
+        string path = GetExchangePath(virtualHost) +
             $"{Uri.EscapeDataString(name)}";
 
         ExchangeTopic requestTopic = new(
@@ -25,20 +29,25 @@ public class RabbitMQAdministrationClient
             Durable: true,
             AutoDelete: false);
 
-        HttpResponseMessage response = await _httpClient.PutAsJsonAsync(path, requestTopic, cancellationToken: cancellationToken);
+        HttpResponseMessage response = await _httpClient.PutAsJsonAsync(
+            path,
+            requestTopic,
+            cancellationToken: cancellationToken);
 
-        await ThrowExceptionIfUnsuccessfulAsync(response, "PUT", path);
+        await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "PUT", path);
     }
 
     internal async Task<IList<ExchangeTopic>> GetTopicsAsync(
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
-        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}";
+        string path = GetExchangePath(virtualHost);
 
-        HttpResponseMessage response = await _httpClient.GetAsync(path, cancellationToken: cancellationToken);
+        HttpResponseMessage response = await _httpClient.GetAsync(
+            path,
+            cancellationToken: cancellationToken);
 
-        await ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
+        await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
 
         List<ExchangeTopic>? payload = await response.Content.ReadFromJsonAsync<List<ExchangeTopic>>(
             cancellationToken: cancellationToken);
@@ -51,14 +60,14 @@ public class RabbitMQAdministrationClient
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
-        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}/" +
+        string path = GetExchangePath(virtualHost) +
             $"{Uri.EscapeDataString(name)}";
 
         HttpResponseMessage response = await _httpClient.GetAsync(
             path,
             cancellationToken: cancellationToken);
 
-        await ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
+        await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
 
         ExchangeTopic? topic = await response
             .Content
@@ -73,28 +82,18 @@ public class RabbitMQAdministrationClient
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
-        string path = $"/api/exchanges/{Uri.EscapeDataString(virtualHost)}/" +
+        string path = GetExchangePath(virtualHost) +
             $"{Uri.EscapeDataString(name)}";
 
         HttpResponseMessage response = await _httpClient.DeleteAsync(
             path,
             cancellationToken: cancellationToken);
 
-        await ThrowExceptionIfUnsuccessfulAsync(response, "DELETE", path);
+        await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "DELETE", path);
     }
 
-    //TODO: find a way to centralize as a common utility
-    private static async Task ThrowExceptionIfUnsuccessfulAsync(
-        HttpResponseMessage response,
-        string httpVerb,
-        string path)
+    private static string GetExchangePath(string virtualHost = "/")
     {
-        if (!response.IsSuccessStatusCode)
-        {
-            string payload = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException(
-                $"{httpVerb} {path} -> {response.StatusCode}. " +
-                $"Payload: {payload}");
-        }
+        return EXCHANGE_PATH + $"{Uri.EscapeDataString(virtualHost)}/";
     }
 }
