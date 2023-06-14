@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <ProjectReference Include="../EventBusExplorer.Server.Infrastructure.AzureServiceBus/EventBusExplorer.Server.Infrastructure.AzureServiceBus.csproj" />
   </ItemGroup>
 
 </Project>

@@ -59,4 +59,23 @@ public interface IServiceBrokerQueuesService
         string queueName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Receive messages from given queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to peek</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <returns>A list of messages</returns>
+    Task<MessageListModel> ReceiveMessagesAsync(
+        string queueName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Receive dead letter messages from given queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to peek</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task<MessageListModel> ReceiveDeadLetterMessagesAsync(
+        string queueName,
+        CancellationToken cancellationToken = default);
 }

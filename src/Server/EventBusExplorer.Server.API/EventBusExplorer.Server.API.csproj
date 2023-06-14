@@ -12,8 +12,6 @@
   <ItemGroup>
     <ProjectReference
       Include="../EventBusExplorer.Server.Application/EventBusExplorer.Server.Application.csproj" />
-    <ProjectReference
-      Include="../EventBusExplorer.Server.Infrastructure.AzureServiceBus/EventBusExplorer.Server.Infrastructure.AzureServiceBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>

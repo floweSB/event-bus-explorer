@@ -92,6 +92,40 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
         return new MessageListModel(toReturn);
     }
 
+    public async Task<MessageListModel> ReceiveMessagesAsync(string queueName, CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
+
+        var receiver = GetReceiver(queueName);
+
+        IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.ReceiveMessagesAsync(
+            MAX_COUNT,
+            maxWaitTime: TimeSpan.FromSeconds(1),
+            cancellationToken: cancellationToken);
+
+        var toReturn = messages
+            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+
+        return new MessageListModel(toReturn);
+    }
+
+    public async Task<MessageListModel> ReceiveDeadLetterMessagesAsync(string queueName, CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
+
+        var receiver = GetDeadLetterReceiver(queueName);
+
+        IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.ReceiveMessagesAsync(
+            MAX_COUNT,
+            maxWaitTime: TimeSpan.FromSeconds(1),
+            cancellationToken: cancellationToken);
+
+        var toReturn = messages
+            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+
+        return new MessageListModel(toReturn);
+    }
+
     private ServiceBusReceiver GetReceiver(string name) =>
         _client.CreateReceiver(name);
 

@@ -60,8 +60,4 @@ public record GetTopicSubscriptionResponse(string Name);
 /// <param name="Name">Name of the created subscription</param>
 public record CreateSubscriptionResponse(string Name);
 
-public record GetMessagesResponse(IList<GetMessageResponse> Messages);
-
-public record GetMessageResponse(long SequenceNumber, string Subject, string Body);
-
 #endregion

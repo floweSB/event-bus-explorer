@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using EventBusExplorer.Server.Application;
 using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,15 @@ namespace EventBusExplorer.Server.API.Controllers;
 public class QueuesController : ControllerBase
 {
     private readonly IServiceBrokerQueuesService _queueService;
+    private readonly IMessagesService _messagesService;
 
-    public QueuesController(IServiceBrokerQueuesService queueService)
+    public QueuesController(IServiceBrokerQueuesService queueService,
+        IMessagesService messagesService)
     {
         _queueService = queueService;
+
+        _messagesService = messagesService ??
+            throw new ArgumentNullException(nameof(messagesService));
     }
 
     /// <summary>
@@ -81,51 +87,26 @@ public class QueuesController : ControllerBase
     /// Peek messages in queue
     /// </summary>
     /// <param name="queueName">Queue name</param>
+    /// <param name="receiveMode">Receive mode</param>
+    /// <param name="subQueue">Sub queue to query</param>
     /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <response code="200">List of peeked messages</response>
     [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
-    [HttpGet("{queueName}/messages/active")]
+    [HttpGet("{queueName}/messages")]
     public async Task<IActionResult> PeekMessagesAsync(
         [FromRoute] string queueName,
+        [FromQuery] ReceiveMode receiveMode,
+        [FromQuery] SubQueue subQueue,
         [FromQuery] long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
     {
-        var messages = await _queueService.PeekMessagesAsync(
+        GetMessagesResponse dto = await _messagesService.GetMessagesAsync(
             queueName,
+            new QuerySettings(receiveMode, subQueue),
             fromSequenceNumber,
             cancellationToken);
 
-        var dtos = messages.Messages
-            .Select(m => new GetMessageResponse(m.SequenceNumber, m.Subject, m.Body))
-            .ToList();
-
-        return Ok(new GetMessagesResponse(dtos));
-    }
-
-    /// <summary>
-    /// Peek dead letter messages in queue
-    /// </summary>
-    /// <param name="queueName">Queue name</param>
-    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
-    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
-    /// <response code="200">List of peeked messages</response>
-    [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
-    [HttpGet("{queueName}/messages/deadletter")]
-    public async Task<IActionResult> PeekDeadLetterMessagesAsync(
-        [FromRoute] string queueName,
-        [FromQuery] long? fromSequenceNumber = null,
-        CancellationToken cancellationToken = default)
-    {
-        var messages = await _queueService.PeekDeadLetterMessagesAsync(
-            queueName,
-            fromSequenceNumber,
-            cancellationToken);
-
-        var dtos = messages.Messages
-            .Select(m => new GetMessageResponse(m.SequenceNumber, m.Subject, m.Body))
-            .ToList();
-
-        return Ok(new GetMessagesResponse(dtos));
+        return Ok(dto);
     }
 }

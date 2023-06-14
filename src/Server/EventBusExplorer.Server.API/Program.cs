@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
 using EventBusExplorer.Server.Application;
 using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 using Microsoft.OpenApi.Models;
@@ -7,9 +8,17 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAzureServiceBus(builder.Configuration);
 
+builder.Services.AddApplication();
+
 builder.Services.AddAutoMapper(typeof(Program), typeof(Placeholder));
 
 builder.Services.AddMvc();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddRouting(opt =>
 {
