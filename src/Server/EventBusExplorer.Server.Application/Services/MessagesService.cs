@@ -20,10 +20,18 @@ internal class MessagesService : IMessagesService
     {
         MessageListModel messages = querySettings switch
         {
-            { ReceiveMode: ReceiveMode.Peek, SubQueue: SubQueue.Active } => await _queueService.PeekMessagesAsync(queueName, fromSequenceNumber, cancellationToken),
-            { ReceiveMode: ReceiveMode.Peek, SubQueue: SubQueue.DeadLetter } => await _queueService.PeekDeadLetterMessagesAsync(queueName, fromSequenceNumber, cancellationToken),
-            { ReceiveMode: ReceiveMode.Receive, SubQueue: SubQueue.Active } => await _queueService.ReceiveMessagesAsync(queueName, cancellationToken),
-            { ReceiveMode: ReceiveMode.Receive, SubQueue: SubQueue.DeadLetter } => await _queueService.ReceiveDeadLetterMessagesAsync(queueName, cancellationToken),
+            { ReceiveMode: ReceiveMode.Peek, SubQueue: SubQueue.Active } =>
+                await _queueService.PeekMessagesAsync(queueName, fromSequenceNumber, cancellationToken),
+
+            { ReceiveMode: ReceiveMode.Peek, SubQueue: SubQueue.DeadLetter } =>
+                await _queueService.PeekDeadLetterMessagesAsync(queueName, fromSequenceNumber, cancellationToken),
+
+            { ReceiveMode: ReceiveMode.Receive, SubQueue: SubQueue.Active } =>
+                await _queueService.ReceiveMessagesAsync(queueName, cancellationToken),
+
+            { ReceiveMode: ReceiveMode.Receive, SubQueue: SubQueue.DeadLetter } =>
+                await _queueService.ReceiveDeadLetterMessagesAsync(queueName, cancellationToken),
+
             _ => throw new NotImplementedException($"Unknown settings: {querySettings.ReceiveMode}, {querySettings.SubQueue}"),
         };
 

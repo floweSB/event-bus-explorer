@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Azure;
+﻿using Azure;
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
