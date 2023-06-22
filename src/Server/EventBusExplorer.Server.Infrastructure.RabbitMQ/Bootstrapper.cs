@@ -9,7 +9,7 @@ namespace EventBusExplorer.Server.Infrastructure.RabbitMQ;
 public static class Bootstrapper
 {
     /// <summary>
-    /// Register Azure Service Bus as event bus
+    /// Register RabbitMQ as event bus
     /// </summary>
     /// <param name="services">Your <see cref="IServiceCollection"/> instance</param>
     /// <param name="configuration">Your <see cref="IConfiguration"/> instance</param>
