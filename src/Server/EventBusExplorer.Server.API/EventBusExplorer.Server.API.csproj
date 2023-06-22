@@ -13,8 +13,6 @@
     <ProjectReference
       Include="../EventBusExplorer.Server.Application/EventBusExplorer.Server.Application.csproj" />
     <ProjectReference
-      Include="../EventBusExplorer.Server.Infrastructure.AzureServiceBus/EventBusExplorer.Server.Infrastructure.AzureServiceBus.csproj" />
-    <ProjectReference
       Include="../EventBusExplorer.Server.Infrastructure.RabbitMQ/EventBusExplorer.Server.Infrastructure.RabbitMQ.csproj" />
   </ItemGroup>
 

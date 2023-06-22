@@ -19,11 +19,22 @@ public static class Bootstrapper
     {
         services.AddHttpClient<RabbitMQAdministrationClient>(client =>
         {
-            client.BaseAddress = configuration.GetValue<Uri>("RabbitMQ:Management:BaseUrl");
+            Uri? baseAddress = configuration.GetValue<Uri?>("RabbitMQ:Management:BaseUrl");
+            string? username = configuration.GetValue<string?>("RabbitMQ:Management:Username");
+            string? password = configuration.GetValue<string?>("RabbitMQ:Management:Password")!;
 
-            string username = configuration.GetValue<string>("RabbitMQ:Management:Username")!;
-            string password = configuration.GetValue<string>("RabbitMQ:Management:Password")!;
+            if (baseAddress is null || username is null || password is null)
+            {
+                StringBuilder errorMessage = new StringBuilder("One or more than one of the following RabbitMQ configuration parameters is not set:");
+                errorMessage.AppendLine();
+                errorMessage.AppendLine("- RABBITMQ__MANAGEMENT__BASEURL");
+                errorMessage.AppendLine("- RABBITMQ__MANAGEMENT__USERNAME");
+                errorMessage.AppendLine("- RABBITMQ__MANAGEMENT__PASSWORD");
 
+                throw new ServiceBrokerSetupException(errorMessage.ToString());
+            }
+
+            client.BaseAddress = baseAddress;
             string base64Credentials = Convert.ToBase64String(
                 Encoding.UTF8.GetBytes($"{username}:{password}"));
 
