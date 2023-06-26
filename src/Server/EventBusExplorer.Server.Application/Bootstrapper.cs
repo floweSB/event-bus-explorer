@@ -8,6 +8,7 @@ public static class Bootstrapper
         this IServiceCollection services)
     {
         services.AddScoped<IMessagesService, MessagesService>();
+        services.AddScoped<IEventBusManagementService, EventBusManagementService>();
 
         return services;
     }

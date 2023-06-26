@@ -67,4 +67,38 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
     {
         throw new NotImplementedException();
     }
+
+    public Task<MessageListModel> PeekMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<MessageListModel> PeekDeadLetterMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<MessageListModel> ReceiveMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<MessageListModel> ReceiveDeadLetterMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Net.Mime;
-using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
+using EventBusExplorer.Server.Application;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventBusExplorer.Server.API.Controllers;
@@ -13,11 +13,18 @@ namespace EventBusExplorer.Server.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class TopicsController : ControllerBase
 {
-    private readonly IServiceBrokerTopicsService _topicService;
+    private readonly IEventBusManagementService _eventBusManagementService;
+    private readonly IMessagesService _messagesService;
 
-    public TopicsController(IServiceBrokerTopicsService topicService)
+    public TopicsController(
+        IEventBusManagementService eventBusManagementService,
+        IMessagesService messagesService)
     {
-        _topicService = topicService;
+        _eventBusManagementService = eventBusManagementService ??
+            throw new ArgumentNullException(nameof(eventBusManagementService));
+
+        _messagesService = messagesService ??
+            throw new ArgumentNullException(nameof(messagesService));
     }
 
     /// <summary>
@@ -28,7 +35,7 @@ public class TopicsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTopicsAsync()
     {
-        IList<string> queueNames = await _topicService.GetTopicsAsync();
+        IList<string> queueNames = await _eventBusManagementService.GetTopicsAsync();
         GetTopicsResponse response = new(queueNames);
 
         return Ok(response);
@@ -43,7 +50,7 @@ public class TopicsController : ControllerBase
     [HttpGet("{name}")]
     public async Task<IActionResult> GetTopicAsync([FromRoute] string name)
     {
-        string queueName = await _topicService.GetTopicAsync(name);
+        string queueName = await _eventBusManagementService.GetTopicAsync(name);
         GetTopicResponse response = new(queueName);
         return Ok(response);
     }
@@ -58,7 +65,7 @@ public class TopicsController : ControllerBase
     public async Task<IActionResult> CreateTopicAsync(
         [FromBody] CreateTopicRequest createRequest)
     {
-        string queueName = await _topicService.CreateTopicAsync(createRequest.Name);
+        string queueName = await _eventBusManagementService.CreateTopicAsync(createRequest.Name);
         CreateTopicResponse queueResponse = new(queueName);
         return Ok(queueResponse);
     }
@@ -73,7 +80,7 @@ public class TopicsController : ControllerBase
     public async Task<IActionResult> DeleteTopicAsync(
         [FromRoute] string name)
     {
-        await _topicService.DeleteTopicAsync(name);
+        await _eventBusManagementService.DeleteTopicAsync(name);
         return NoContent();
     }
 
@@ -86,7 +93,7 @@ public class TopicsController : ControllerBase
     [HttpGet("{topicName}/subscriptions")]
     public async Task<IActionResult> GetSubscriptionsAsync(string topicName)
     {
-        IList<string> subscriptionNames = await _topicService.GetSubscriptionsAsync(topicName);
+        IList<string> subscriptionNames = await _eventBusManagementService.GetTopicSubscriptionsAsync(topicName);
         GetTopicSubscriptionsResponse response = new(subscriptionNames);
         return Ok(response);
     }
@@ -100,7 +107,7 @@ public class TopicsController : ControllerBase
     [HttpGet("{topicName}/subscriptions/{subscriptionName}")]
     public async Task<IActionResult> GetSubscriptionAsync([FromRoute] string topicName, [FromRoute] string subscriptionName)
     {
-        string name = await _topicService.GetSubscriptionAsync(topicName, subscriptionName);
+        string name = await _eventBusManagementService.GetTopicSubscriptionAsync(topicName, subscriptionName);
         GetTopicSubscriptionResponse response = new(name);
         return Ok(response);
     }
@@ -117,7 +124,7 @@ public class TopicsController : ControllerBase
         [FromRoute] string topicName,
         [FromBody] CreateSubscriptionRequest createRequest)
     {
-        string subscriptionName = await _topicService.CreateSubscriptionAsync(topicName, createRequest.Name);
+        string subscriptionName = await _eventBusManagementService.CreateTopicSubscriptionAsync(topicName, createRequest.Name);
         CreateSubscriptionResponse response = new(subscriptionName);
         return Ok(response);
     }
@@ -134,7 +141,37 @@ public class TopicsController : ControllerBase
         [FromRoute] string topicName,
         [FromRoute] string subscriptionName)
     {
-        await _topicService.DeleteSubscriptionAsync(topicName, subscriptionName);
+        await _eventBusManagementService.DeleteTopicSubscriptionAsync(topicName, subscriptionName);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Peek messages in topic subscription
+    /// </summary>
+    /// <param name="topicName">Topic name</param>
+    /// <param name="subscriptionName">Topic subscription name</param>
+    /// <param name="receiveMode">Receive mode</param>
+    /// <param name="subQueue">Sub queue to query</param>
+    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <response code="200">List of peeked messages</response>
+    [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
+    [HttpGet("{topicName}/subscriptions/{subscriptionName}/messages")]
+    public async Task<IActionResult> PeekMessagesAsync(
+        [FromRoute] string topicName,
+        [FromRoute] string subscriptionName,
+        [FromQuery] ReceiveMode receiveMode,
+        [FromQuery] SubQueue subQueue,
+        [FromQuery] long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        GetMessagesResponse dto = await _messagesService.GetMessagesAsync(
+            topicName,
+            subscriptionName,
+            new QuerySettings(receiveMode, subQueue),
+            fromSequenceNumber,
+            cancellationToken);
+
+        return Ok(dto);
     }
 }
