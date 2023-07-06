@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  build:
+  publish:
     runs-on: ubuntu-22.04
     defaults:
       run:
@@ -25,7 +25,7 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ github.actor }}
+        username: ghcr.io/${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Docker meta
