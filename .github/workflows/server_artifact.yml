@@ -35,9 +35,6 @@ jobs:
         images: |
           flowesb/event-bus-explorer
         tags: |
-          type=schedule
-          type=ref,event=branch
-          type=ref
           type=sha
         labels:
           org.opencontainers.image.title=event-bus-explorer
