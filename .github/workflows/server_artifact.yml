@@ -40,7 +40,7 @@ jobs:
           org.opencontainers.image.title=event-bus-explorer
           org.opencontainers.image.description=EventBusExplorer build
           org.opencontainers.image.authors=FloweSB
-          org.opencontainers.image.url=github.com/FloweSB
+          org.opencontainers.image.url=github.com/FloweSB/event-bus-explorer
 
     - name: Build Docker Image
       uses: docker/build-push-action@v4
