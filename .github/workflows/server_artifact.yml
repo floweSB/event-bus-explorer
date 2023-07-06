@@ -2,10 +2,9 @@ name: EventBusExplorer
 
 on:
   push:
-    branches: [Krusty93/issue25] # to change
+    branches: [main]
     paths:
       - src/Server/**
-      - .github/workflows/server_artifact.yml # to remove
 
 env:
   REGISTRY: ghcr.io
