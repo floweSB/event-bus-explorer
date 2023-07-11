@@ -13,8 +13,9 @@ public class RabbitMQAdministrationClient
         _httpClient = httpClient!;
     }
 
-    internal async Task CreateTopicAsync(
+    internal async Task CreateExchangeAsync(
         string? name,
+        ExchangeType type,
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
@@ -24,20 +25,22 @@ public class RabbitMQAdministrationClient
         string path = GetExchangePath(virtualHost) +
             $"{Uri.EscapeDataString(name)}";
 
-        ExchangeTopic requestTopic = new(
+        Exchange exchange = new(
             Name: name ?? string.Empty,
             Durable: true,
-            AutoDelete: false);
+            AutoDelete: false,
+            Type: type);
 
         HttpResponseMessage response = await _httpClient.PutAsJsonAsync(
             path,
-            requestTopic,
+            exchange,
             cancellationToken: cancellationToken);
 
         await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "PUT", path);
     }
 
-    internal async Task<IList<ExchangeTopic>> GetTopicsAsync(
+    internal async Task<IList<Exchange>> GetExchangesAsync(
+        ExchangeType type,
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
@@ -49,14 +52,15 @@ public class RabbitMQAdministrationClient
 
         await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
 
-        List<ExchangeTopic>? payload = await response.Content.ReadFromJsonAsync<List<ExchangeTopic>>(
-            cancellationToken: cancellationToken);
+        List<Exchange> exchanges = await response.Content.ReadFromJsonAsync<List<Exchange>>(
+            cancellationToken: cancellationToken) ?? new List<Exchange>();
 
-        return payload!;
+        return exchanges.Where(x => x.Type == type).ToList();
     }
 
-    internal async Task<ExchangeTopic> GetTopicAsync(
+    internal async Task<Exchange?> GetExchangeAsync(
         string name,
+        ExchangeType type,
         string virtualHost = "/",
         CancellationToken cancellationToken = default)
     {
@@ -64,20 +68,20 @@ public class RabbitMQAdministrationClient
             $"{Uri.EscapeDataString(name)}";
 
         HttpResponseMessage response = await _httpClient.GetAsync(
-            path,
-            cancellationToken: cancellationToken);
+             path,
+        cancellationToken: cancellationToken);
 
         await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
 
-        ExchangeTopic? topic = await response
+        Exchange? exchange = await response
             .Content
-            .ReadFromJsonAsync<ExchangeTopic>(
-                cancellationToken: cancellationToken);
+            .ReadFromJsonAsync<Exchange>(
+            cancellationToken: cancellationToken);
 
-        return topic!;
+        return exchange is not null && exchange.Type == type ? exchange : null;
     }
 
-    internal async Task DeleteTopicAsync(
+    internal async Task DeleteExchangeAsync(
         string name,
         string virtualHost = "/",
         CancellationToken cancellationToken = default)

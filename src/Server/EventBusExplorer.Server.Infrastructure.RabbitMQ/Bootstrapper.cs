@@ -44,5 +44,6 @@ public static class Bootstrapper
         });
 
         services.AddScoped<IServiceBrokerTopicsService, RabbitMQTopicsService>();
+        services.AddScoped<IServiceBrokerQueuesService, RabbitMQQueuesService>();
     }
 }
