@@ -157,7 +157,7 @@ public class TopicsController : ControllerBase
     /// <response code="200">List of peeked messages</response>
     [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
     [HttpGet("{topicName}/subscriptions/{subscriptionName}/messages")]
-    public async Task<IActionResult> PeekMessagesAsync(
+    public async Task<IActionResult> GetMessagesAsync(
         [FromRoute] string topicName,
         [FromRoute] string subscriptionName,
         [FromQuery] ReceiveMode receiveMode,
