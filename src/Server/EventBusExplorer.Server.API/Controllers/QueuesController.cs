@@ -95,7 +95,7 @@ public class QueuesController : ControllerBase
     /// <response code="200">List of peeked messages</response>
     [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
     [HttpGet("{queueName}/messages")]
-    public async Task<IActionResult> PeekMessagesAsync(
+    public async Task<IActionResult> GetMessagesAsync(
         [FromRoute] string queueName,
         [FromQuery] ReceiveMode receiveMode,
         [FromQuery] SubQueue subQueue,
