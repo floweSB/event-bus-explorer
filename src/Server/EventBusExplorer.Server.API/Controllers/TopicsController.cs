@@ -28,8 +28,8 @@ public class TopicsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTopicsAsync()
     {
-        IList<string> queueNames = await _topicService.GetTopicsAsync();
-        GetTopicsResponse response = new(queueNames);
+        IList<string> topicNames = await _topicService.GetTopicsAsync();
+        GetTopicsResponse response = new(topicNames);
 
         return Ok(response);
     }

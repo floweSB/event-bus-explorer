@@ -43,6 +43,22 @@ public static class Bootstrapper
                 base64Credentials);
         });
 
+        services.AddScoped(builder =>
+        {
+            string? hostname = configuration.GetValue<string>("RabbitMQ:Hostname");
+
+            if (hostname is null)
+            {
+                StringBuilder errorMessage = new StringBuilder("One or more than one of the following RabbitMQ configuration parameters is not set:");
+                errorMessage.AppendLine();
+                errorMessage.AppendLine("- RABBITMQ__HOSTNAME");
+
+                throw new ServiceBrokerSetupException(errorMessage.ToString());
+            }
+
+            return new RabbitMQClient(hostname.ToString());
+        });
+
         services.AddScoped<IServiceBrokerTopicsService, RabbitMQTopicsService>();
         services.AddScoped<IServiceBrokerQueuesService, RabbitMQQueuesService>();
     }

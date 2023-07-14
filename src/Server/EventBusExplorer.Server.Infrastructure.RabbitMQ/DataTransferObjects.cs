@@ -21,3 +21,11 @@ internal enum ExchangeType
     [EnumMember(Value = "headers")]
     Headers
 }
+
+public record Binding(
+    string Source,
+    string Vhost,
+    string Destination,
+    string DestinationType,
+    string RoutingKey
+);

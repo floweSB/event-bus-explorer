@@ -96,6 +96,38 @@ public class RabbitMQAdministrationClient
         await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "DELETE", path);
     }
 
+    internal async Task<IList<string>> GetQueuesAsync(
+        string exchangeName,
+        string virtualHost = "/",
+        CancellationToken cancellationToken = default)
+    {
+        string path = GetExchangePath(virtualHost) +
+            $"{Uri.EscapeDataString(exchangeName)}/bindings/source";
+
+        HttpResponseMessage response = await _httpClient.GetAsync(
+             path,
+        cancellationToken: cancellationToken);
+
+        await Utils.ThrowExceptionIfUnsuccessfulAsync(response, "GET", path);
+
+        List<Binding> bindings = (await response.Content.ReadFromJsonAsync<List<Binding>>(
+            cancellationToken: cancellationToken))!;
+
+        List<string> queueNames = bindings.Select(b => b.Destination).ToList();
+
+        return queueNames;
+    }
+
+    internal async Task<string> GetQueueAsync(
+        string queueName,
+        string exchangeName,
+        string virtualHost = "/",
+        CancellationToken cancellationToken = default)
+    {
+        return (await GetQueuesAsync(exchangeName, virtualHost, cancellationToken))
+            .SingleOrDefault(x => x == queueName);
+    }
+
     private static string GetExchangePath(string virtualHost = "/")
     {
         return EXCHANGE_PATH + $"{Uri.EscapeDataString(virtualHost)}/";
