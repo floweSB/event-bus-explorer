@@ -11,7 +11,7 @@ param location string
 param serviceBusConnectionString string
 
 @description('App Service container settings')
-param linuxFxVersion string = 'DOCKER|krusty93/event-bus-explorer:latest'
+param linuxFxVersion string = 'DOCKER|flowesb/event-bus-explorer:latest'
 
 resource appServiceAppPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -45,7 +45,7 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
         }
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
-          value: 'https://index.docker.io'
+          value: 'https://ghcr.io'
         }
         {
           name: 'DOCKER_REGISTRY_SERVER_USERNAME'
