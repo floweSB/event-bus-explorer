@@ -68,7 +68,7 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
         throw new NotImplementedException();
     }
 
-    public Task<MessageListModel> PeekMessagesAsync(
+    public Task<MessageList> PeekMessagesAsync(
         string topicName,
         string susbcriptionName,
         long? fromSequenceNumber = null,
@@ -77,7 +77,7 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
         throw new NotImplementedException();
     }
 
-    public Task<MessageListModel> PeekDeadLetterMessagesAsync(
+    public Task<MessageList> PeekDeadLetterMessagesAsync(
         string topicName,
         string susbcriptionName,
         long? fromSequenceNumber = null,
@@ -86,7 +86,7 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
         throw new NotImplementedException();
     }
 
-    public Task<MessageListModel> ReceiveMessagesAsync(
+    public Task<MessageList> ReceiveMessagesAsync(
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default)
@@ -94,7 +94,7 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
         throw new NotImplementedException();
     }
 
-    public Task<MessageListModel> ReceiveDeadLetterMessagesAsync(
+    public Task<MessageList> ReceiveDeadLetterMessagesAsync(
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default)

@@ -79,7 +79,7 @@ public interface IServiceBrokerTopicsService
     /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A list of messages</returns>
-    Task<MessageListModel> PeekMessagesAsync(
+    Task<MessageList> PeekMessagesAsync(
         string topicName,
         string susbcriptionName,
         long? fromSequenceNumber = null,
@@ -93,7 +93,7 @@ public interface IServiceBrokerTopicsService
     /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A list of messages</returns>
-    Task<MessageListModel> PeekDeadLetterMessagesAsync(
+    Task<MessageList> PeekDeadLetterMessagesAsync(
         string topicName,
         string susbcriptionName,
         long? fromSequenceNumber = null,
@@ -106,7 +106,7 @@ public interface IServiceBrokerTopicsService
     /// <param name="susbcriptionName">Name of the topic susbcription to peek</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A list of messages</returns>
-    Task<MessageListModel> ReceiveMessagesAsync(
+    Task<MessageList> ReceiveMessagesAsync(
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default);
@@ -117,7 +117,7 @@ public interface IServiceBrokerTopicsService
     /// <param name="topicName">Name of the topic to peek</param>
     /// <param name="susbcriptionName">Name of the topic susbcription to peek</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
-    Task<MessageListModel> ReceiveDeadLetterMessagesAsync(
+    Task<MessageList> ReceiveDeadLetterMessagesAsync(
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default);

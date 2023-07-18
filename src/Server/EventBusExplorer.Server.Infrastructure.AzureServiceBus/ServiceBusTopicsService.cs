@@ -80,7 +80,7 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         await _adminClient.DeleteSubscriptionAsync(topicName, subscriptionName, cancellationToken);
     }
 
-    public async Task<MessageListModel> PeekMessagesAsync(
+    public async Task<MessageList> PeekMessagesAsync(
         string topicName,
         string susbcriptionName,
         long? fromSequenceNumber = null,
@@ -96,12 +96,12 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
-    public async Task<MessageListModel> PeekDeadLetterMessagesAsync(
+    public async Task<MessageList> PeekDeadLetterMessagesAsync(
         string topicName,
         string susbcriptionName,
         long? fromSequenceNumber = null,
@@ -117,12 +117,12 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
-    public async Task<MessageListModel> ReceiveMessagesAsync(
+    public async Task<MessageList> ReceiveMessagesAsync(
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default)
@@ -137,12 +137,12 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
-    public async Task<MessageListModel> ReceiveDeadLetterMessagesAsync(
+    public async Task<MessageList> ReceiveDeadLetterMessagesAsync(
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default)
@@ -157,9 +157,9 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
     private ServiceBusReceiver GetReceiver(string topicName, string subscriptionName) =>

@@ -1,19 +1,19 @@
 ﻿namespace EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
-public record MessageModel(
+public record Message(
     long SequenceNumber,
     string Subject,
     string Body);
 
-public record MessageListModel
+public record MessageList
 {
-    public MessageListModel(IEnumerable<MessageModel> messages)
+    public MessageList(IEnumerable<Message> messages)
     {
         if (messages is null)
             throw new ArgumentNullException(nameof(messages));
 
-        Messages = new List<MessageModel>(messages).AsReadOnly();
+        Messages = new List<Message>(messages).AsReadOnly();
     }
 
-    public IReadOnlyCollection<MessageModel> Messages { get; }
+    public IReadOnlyCollection<Message> Messages { get; }
 }

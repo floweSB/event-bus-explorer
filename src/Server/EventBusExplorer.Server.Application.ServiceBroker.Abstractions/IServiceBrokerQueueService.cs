@@ -43,7 +43,7 @@ public interface IServiceBrokerQueuesService
     /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A list of messages</returns>
-    Task<MessageListModel> PeekMessagesAsync(
+    Task<MessageList> PeekMessagesAsync(
         string queueName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default);
@@ -55,7 +55,7 @@ public interface IServiceBrokerQueuesService
     /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A list of messages</returns>
-    Task<MessageListModel> PeekDeadLetterMessagesAsync(
+    Task<MessageList> PeekDeadLetterMessagesAsync(
         string queueName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default);
@@ -66,7 +66,7 @@ public interface IServiceBrokerQueuesService
     /// <param name="queueName">Name of the queue to peek</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A list of messages</returns>
-    Task<MessageListModel> ReceiveMessagesAsync(
+    Task<MessageList> ReceiveMessagesAsync(
         string queueName,
         CancellationToken cancellationToken = default);
 
@@ -75,7 +75,7 @@ public interface IServiceBrokerQueuesService
     /// </summary>
     /// <param name="queueName">Name of the queue to peek</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
-    Task<MessageListModel> ReceiveDeadLetterMessagesAsync(
+    Task<MessageList> ReceiveDeadLetterMessagesAsync(
         string queueName,
         CancellationToken cancellationToken = default);
 }

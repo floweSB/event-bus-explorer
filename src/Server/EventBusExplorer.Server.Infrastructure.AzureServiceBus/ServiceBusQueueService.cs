@@ -51,7 +51,7 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
         return queueProperties.Name;
     }
 
-    public async Task<MessageListModel> PeekMessagesAsync(
+    public async Task<MessageList> PeekMessagesAsync(
         string queueName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
@@ -66,12 +66,12 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
-    public async Task<MessageListModel> PeekDeadLetterMessagesAsync(
+    public async Task<MessageList> PeekDeadLetterMessagesAsync(
         string queueName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
@@ -86,12 +86,12 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
-    public async Task<MessageListModel> ReceiveMessagesAsync(string queueName, CancellationToken cancellationToken = default)
+    public async Task<MessageList> ReceiveMessagesAsync(string queueName, CancellationToken cancellationToken = default)
     {
         const int MAX_COUNT = 50;
 
@@ -103,12 +103,12 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
-    public async Task<MessageListModel> ReceiveDeadLetterMessagesAsync(string queueName, CancellationToken cancellationToken = default)
+    public async Task<MessageList> ReceiveDeadLetterMessagesAsync(string queueName, CancellationToken cancellationToken = default)
     {
         const int MAX_COUNT = 50;
 
@@ -120,9 +120,9 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
             cancellationToken: cancellationToken);
 
         var toReturn = messages
-            .Select(m => new MessageModel(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
+            .Select(m => new Message(m.SequenceNumber, m.Subject, MessagesHelper.ReadMessage(m.Body)));
 
-        return new MessageListModel(toReturn);
+        return new MessageList(toReturn);
     }
 
     private ServiceBusReceiver GetReceiver(string name) =>

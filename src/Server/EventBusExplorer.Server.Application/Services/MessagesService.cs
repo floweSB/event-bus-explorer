@@ -24,7 +24,7 @@ internal class MessagesService : IMessagesService
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
     {
-        MessageListModel messages = querySettings switch
+        MessageList messages = querySettings switch
         {
             { ReceiveMode: ReceiveMode.Peek, SubQueue: SubQueue.Active } =>
                 await _queuesService.PeekMessagesAsync(queueName, fromSequenceNumber, cancellationToken),
@@ -55,7 +55,7 @@ internal class MessagesService : IMessagesService
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
     {
-        MessageListModel messages = querySettings switch
+        MessageList messages = querySettings switch
         {
             { ReceiveMode: ReceiveMode.Peek, SubQueue: SubQueue.Active } =>
                 await _topicsService.PeekMessagesAsync(topicName, subscriptionName, fromSequenceNumber, cancellationToken),
