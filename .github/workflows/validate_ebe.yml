@@ -26,10 +26,9 @@ jobs:
         images: |
           flowesb/event-bus-explorer
         tags: |
-          type=schedule
+          type=schedule,pattern={{date 'YYYYMMDD-hhmmss'}}
           type=ref,event=branch
           type=ref,event=pr
-          type=sha
         labels:
           org.opencontainers.image.title=event-bus-explorer-pr
           org.opencontainers.image.description=EventBusExplorer Validation build
