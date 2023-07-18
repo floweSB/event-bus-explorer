@@ -1,8 +1,8 @@
-name: EventBusExplorer
+name: Deploy EventBusExplorer
 
 on:
   push:
-    branches: [Krusty93/issue25]
+    branches: [main]
     paths:
       - src/Server/**
       - .github/workflows/deploy_ebe.yml

@@ -1,4 +1,4 @@
-name: EventBusExplorer (PR)
+name: Validate EventBusExplorer
 
 on:
   pull_request:
