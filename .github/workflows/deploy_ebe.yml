@@ -2,9 +2,10 @@ name: EventBusExplorer
 
 on:
   push:
-    branches: [main]
+    branches: [Krusty93/issue25]
     paths:
       - src/Server/**
+      - .github/workflows/deploy_ebe.yml
 
 env:
   REGISTRY: ghcr.io
@@ -46,10 +47,11 @@ jobs:
           ${{ env.REGISTRY }}/${{ github.repository }}
         tags: |
           type=sha
-          latest
+          type=ref,event=push
+          type=raw,value=latest,enable={{is_default_branch}}
         labels:
           org.opencontainers.image.title=${{ github.repository }}
-          org.opencontainers.image.description=EventBusExplorer build
+          org.opencontainers.image.description=EventBusExplorer release build
           org.opencontainers.image.authors=FloweSB
           org.opencontainers.image.url=github.com/FloweSB/${{ github.repository }}
 
