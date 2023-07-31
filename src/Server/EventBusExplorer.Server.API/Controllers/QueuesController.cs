@@ -1,5 +1,5 @@
 ﻿using System.Net.Mime;
-using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
+using EventBusExplorer.Server.Application;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventBusExplorer.Server.API.Controllers;
@@ -13,11 +13,18 @@ namespace EventBusExplorer.Server.API.Controllers;
 [Produces(MediaTypeNames.Application.Json)]
 public class QueuesController : ControllerBase
 {
-    private readonly IServiceBrokerQueuesService _queueService;
+    private readonly IEventBusManagementService _eventBusManagementService;
+    private readonly IMessagesService _messagesService;
 
-    public QueuesController(IServiceBrokerQueuesService queueService)
+    public QueuesController(
+        IEventBusManagementService eventBusManagementService,
+        IMessagesService messagesService)
     {
-        _queueService = queueService;
+        _eventBusManagementService = eventBusManagementService ??
+            throw new ArgumentNullException(nameof(eventBusManagementService));
+
+        _messagesService = messagesService ??
+            throw new ArgumentNullException(nameof(messagesService));
     }
 
     /// <summary>
@@ -28,7 +35,7 @@ public class QueuesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAsync()
     {
-        IList<string> queueNames = await _queueService.GetAsync();
+        IList<string> queueNames = await _eventBusManagementService.GetQueuesAsync();
         GetQueuesResponse response = new(queueNames);
 
         return Ok(response);
@@ -43,7 +50,7 @@ public class QueuesController : ControllerBase
     [HttpGet("{name}")]
     public async Task<IActionResult> GetAsync([FromRoute] string name)
     {
-        string queueName = await _queueService.GetAsync(name);
+        string queueName = await _eventBusManagementService.GetQueueAsync(name);
         GetQueueResponse response = new(queueName);
         return Ok(response);
     }
@@ -58,7 +65,7 @@ public class QueuesController : ControllerBase
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateQueueRequest createRequest)
     {
-        string queueName = await _queueService.CreateAsync(createRequest.Name);
+        string queueName = await _eventBusManagementService.CreateQueueAsync(createRequest.Name);
         CreateQueueResponse queueResponse = new(queueName);
         return Ok(queueResponse);
     }
@@ -73,7 +80,34 @@ public class QueuesController : ControllerBase
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] string name)
     {
-        await _queueService.DeleteAsync(name);
+        await _eventBusManagementService.DeleteQueueAsync(name);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Peek messages in queue
+    /// </summary>
+    /// <param name="queueName">Queue name</param>
+    /// <param name="receiveMode">Receive mode</param>
+    /// <param name="subQueue">Sub queue to query</param>
+    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <response code="200">List of peeked messages</response>
+    [ProducesResponseType(typeof(GetMessagesResponse), StatusCodes.Status200OK)]
+    [HttpGet("{queueName}/messages")]
+    public async Task<IActionResult> GetMessagesAsync(
+        [FromRoute] string queueName,
+        [FromQuery] ReceiveMode receiveMode,
+        [FromQuery] SubQueue subQueue,
+        [FromQuery] long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default)
+    {
+        GetMessagesResponse dto = await _messagesService.GetMessagesAsync(
+            queueName,
+            new QuerySettings(receiveMode, subQueue),
+            fromSequenceNumber,
+            cancellationToken);
+
+        return Ok(dto);
     }
 }

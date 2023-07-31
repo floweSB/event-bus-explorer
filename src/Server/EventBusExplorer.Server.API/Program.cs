@@ -1,15 +1,25 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
 using EventBusExplorer.Server.Application;
-using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
+using EventBusExplorer.Server.Infrastructure.RabbitMQ;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAzureServiceBus(builder.Configuration);
+builder.Services.AddRabbitMQ(builder.Configuration);
+
+builder.Services.AddApplication();
 
 builder.Services.AddAutoMapper(typeof(Program), typeof(Placeholder));
 
 builder.Services.AddMvc();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddRouting(opt =>
 {
@@ -21,7 +31,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     ConfigurationManager config = builder.Configuration;
 
-    var contact = new OpenApiContact
+    OpenApiContact contact = new OpenApiContact
     {
         Name = config["SwaggerApiInfo:Name"],
         Url = new Uri(config["SwaggerApiInfo:Uri"]!),
@@ -42,6 +52,34 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 WebApplication app = builder.Build();
+
+
+// Log unhandled exceptions and return 500 without info leaks.
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        context.Response.ContentType = System.Net.Mime.MediaTypeNames.Application.Json;
+
+        IExceptionHandlerPathFeature? exceptionHandlerPathFeature =
+            context.Features.Get<IExceptionHandlerPathFeature>();
+
+        // Given that this code is called on exception, then Exception cannot be null.
+        Exception e = exceptionHandlerPathFeature!.Error!;
+
+        ILogger<Program> logger = exceptionHandlerApp.ApplicationServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(e, "{Message}", e.Message);
+
+        var responsePayload = new
+        {
+            Code = "InternalServerError",
+        };
+
+        await context.Response.WriteAsJsonAsync(responsePayload);
+    });
+});
 
 if (builder.Environment.IsDevelopment())
 {

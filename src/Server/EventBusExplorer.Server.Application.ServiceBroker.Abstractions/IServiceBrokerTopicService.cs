@@ -70,4 +70,55 @@ public interface IServiceBrokerTopicsService
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>A task</returns>
     Task DeleteSubscriptionAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Peek messages from given topic subscription
+    /// </summary>
+    /// <param name="topicName">Name of the topic to peek</param>
+    /// <param name="susbcriptionName">Name of the topic susbcription to peek</param>
+    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <returns>A list of messages</returns>
+    Task<MessageList> PeekMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Peek dead letter messages from given topic subscription
+    /// </summary>
+    /// <param name="topicName">Name of the topic to peek</param>
+    /// <param name="susbcriptionName">Name of the topic susbcription to peek</param>
+    /// <param name="fromSequenceNumber">(Optional) Fetch messages from this one</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <returns>A list of messages</returns>
+    Task<MessageList> PeekDeadLetterMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Receive messages from given topic subscription
+    /// </summary>
+    /// <param name="topicName">Name of the topic to peek</param>
+    /// <param name="susbcriptionName">Name of the topic susbcription to peek</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <returns>A list of messages</returns>
+    Task<MessageList> ReceiveMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Receive dead letter messages from given topic subscription
+    /// </summary>
+    /// <param name="topicName">Name of the topic to peek</param>
+    /// <param name="susbcriptionName">Name of the topic susbcription to peek</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task<MessageList> ReceiveDeadLetterMessagesAsync(
+        string topicName,
+        string susbcriptionName,
+        CancellationToken cancellationToken = default);
 }

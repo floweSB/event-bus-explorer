@@ -1,11 +1,11 @@
-name: EventBusExplorer (PR)
+name: Validate EventBusExplorer
 
 on:
   pull_request:
     branches: [main]
     paths:
       - src/Server/**
-      - .github/workflows/server_pr.yml
+      - .github/workflows/validate_ebe.yml
 
 jobs:
 
@@ -18,8 +18,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     - name: Docker meta
       id: meta
@@ -28,15 +26,14 @@ jobs:
         images: |
           flowesb/event-bus-explorer
         tags: |
-          type=schedule
+          type=schedule,pattern={{date 'YYYYMMDD-hhmmss'}}
           type=ref,event=branch
           type=ref,event=pr
-          type=sha
         labels:
           org.opencontainers.image.title=event-bus-explorer-pr
           org.opencontainers.image.description=EventBusExplorer Validation build
           org.opencontainers.image.authors=FloweSB
-          org.opencontainers.image.url=github.com/FloweSB
+          org.opencontainers.image.url=github.com/FloweSB/event-bus-explorer
 
     - name: Build Docker Image
       uses: docker/build-push-action@v4
