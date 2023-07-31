@@ -5,7 +5,7 @@ param appServicePlanName string = 'asp-ebe-flowesb-001'
 param appServiceName string = 'as-ebe-flowesb-001'
 
 @description('AppService location')
-param location string = '[resourceGroup().location]'
+param location string = resourceGroup().location
 
 @description('')
 param serviceBusConnectionString string
