@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
 using EventBusExplorer.Server.Application;
-using EventBusExplorer.Server.Infrastructure.RabbitMQ;
+using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRabbitMQ(builder.Configuration);
+builder.Services.AddAzureServiceBus(builder.Configuration);
 
 builder.Services.AddApplication();
 
