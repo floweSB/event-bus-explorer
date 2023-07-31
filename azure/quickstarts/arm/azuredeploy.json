@@ -11,12 +11,14 @@
     },
     "appServicePlanName": {
       "type": "string",
+      "defaultValue": "asp-ebe-flowesb-001",
       "metadata": {
         "description": "App Service Plan Name"
       }
     },
     "appServiceName": {
       "type": "string",
+      "defaultValue": "as-ebe-flowesb-001",
       "metadata": {
         "description": "App Service Name"
       }
