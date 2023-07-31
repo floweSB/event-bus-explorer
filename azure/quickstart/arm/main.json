@@ -1,0 +1,101 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "type": "string",
+      "defaultValue": "asp-ebe-flowesb-001",
+      "metadata": {
+        "description": "App Service Plan Name"
+      }
+    },
+    "appServiceName": {
+      "type": "string",
+      "defaultValue": "as-ebe-flowesb-001",
+      "metadata": {
+        "description": "App Service Name"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[[resourceGroup().location]",
+      "metadata": {
+        "description": "The app service location"
+      }
+    },
+    "serviceBusConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Service Bus root connection string"
+      }
+    },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "DOCKER|flowesb/event-bus-explorer:latest",
+      "metadata": {
+        "description": "App Service container settings"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "reserved": true
+      },
+      "sku": {
+        "name": "F1",
+        "tier": "Free"
+      },
+      "kind": "linux"
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('appServiceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "linuxFxVersion": "[parameters('linuxFxVersion')]",
+          "appSettings": [
+            {
+              "name": "ConnectionStrings__ServiceBus",
+              "value": "[parameters('serviceBusConnectionString')]"
+            },
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "Development"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "https://ghcr.io"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": ""
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": null
+            },
+            {
+              "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+              "value": "false"
+            }
+          ]
+        }
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+      ]
+    }
+  ]
+}
