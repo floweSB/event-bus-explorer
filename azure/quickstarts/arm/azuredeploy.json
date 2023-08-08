@@ -9,18 +9,25 @@
         "description": "Location for all resources."
       }
     },
-    "appServicePlanName": {
+    "logAnalyticsWorkspace": {
       "type": "string",
-      "defaultValue": "asp-ebe-flowesb-001",
+      "defaultValue": "log-ebe-flowesb-001",
       "metadata": {
-        "description": "App Service Plan Name"
+        "description": "Log analytics workspace associated with the container app"
       }
     },
-    "appServiceName": {
+    "containerAppEnvironment": {
       "type": "string",
-      "defaultValue": "as-ebe-flowesb-001",
+      "defaultValue": "cae-ebe-flowesb-001",
       "metadata": {
-        "description": "App Service Name"
+        "description": "Container app Environment"
+      }
+    },
+    "containerApp": {
+      "type": "string",
+      "defaultValue": "ca-ebe-flowesb-001",
+      "metadata": {
+        "description": "Container App name"
       }
     },
     "serviceBusConnectionString": {
@@ -28,66 +35,97 @@
       "metadata": {
         "description": "Service Bus root connection string"
       }
+    },
+    "revisionSuffix": {
+      "type": "string",
+      "defaultValue": "[utcNow()]"
     }
   },
   "resources": [
     {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-09-01",
-      "name": "[parameters('appServicePlanName')]",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[parameters('logAnalyticsWorkspace')]",
       "location": "[parameters('location')]",
       "properties": {
-        "reserved": true
-      },
-      "sku": {
-        "name": "F1",
-        "tier": "Free"
-      },
-      "kind": "linux"
+        "sku": {
+          "name": "PerGB2018"
+        }
+      }
     },
     {
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2022-09-01",
-      "name": "[parameters('appServiceName')]",
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2023-04-01-preview",
+      "name": "[parameters('containerAppEnvironment')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Consumption"
+      },
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace')), '2022-10-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace')), '2022-10-01').primarySharedKey]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-04-01-preview",
+      "name": "[parameters('containerApp')]",
       "location": "[parameters('location')]",
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
-        "httpsOnly": true,
-        "siteConfig": {
-          "linuxFxVersion": "DOCKER|flowesb/event-bus-explorer:latest",
-          "appSettings": [
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('containerAppEnvironment'))]",
+        "configuration": {
+          "ingress": {
+            "external": true,
+            "targetPort": 80,
+            "allowInsecure": false,
+            "traffic": [
+              {
+                "latestRevision": true,
+                "weight": 100
+              }
+            ]
+          },
+          "secrets": [
             {
-              "name": "ConnectionStrings__ServiceBus",
+              "name": "service-bus-connection-string",
               "value": "[parameters('serviceBusConnectionString')]"
-            },
+            }
+          ]
+        },
+        "template": {
+          "revisionSuffix": "[toLower(parameters('revisionSuffix'))]",
+          "containers": [
             {
-              "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "Development"
-            },
-            {
-              "name": "DOCKER_REGISTRY_SERVER_URL",
-              "value": "https://ghcr.io"
-            },
-            {
-              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-              "value": ""
-            },
-            {
-              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-              "value": null
-            },
-            {
-              "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
-              "value": "false"
+              "name": "[parameters('containerApp')]",
+              "image": "ghcr.io/flowesb/event-bus-explorer:latest",
+              "resources": {
+                "cpu": 0.25,
+                "memory": ".5Gi"
+              },
+              "env": [
+                {
+                  "name": "ASPNETCORE_ENVIRONMENT",
+                  "value": "Development"
+                },
+                {
+                  "name": "ConnectionStrings__ServiceBus",
+                  "secretRef": "service-bus-connection-string"
+                }
+              ]
             }
           ]
         }
       },
-      "identity": {
-        "type": "SystemAssigned"
-      },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+        "[resourceId('Microsoft.App/managedEnvironments', parameters('containerAppEnvironment'))]"
       ]
     }
   ]
