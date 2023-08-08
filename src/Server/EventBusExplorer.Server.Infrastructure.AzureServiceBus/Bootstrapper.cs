@@ -1,4 +1,5 @@
-﻿using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
+﻿using Azure.Identity;
+using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,9 +27,12 @@ public static class Bootstrapper
     {
         services.AddAzureClients(builder =>
         {
-            string connectionString = configuration.GetConnectionString("ServiceBus")!;
-            builder.AddServiceBusAdministrationClient(connectionString);
-            builder.AddServiceBusClient(connectionString);
+            builder.UseCredential(new DefaultAzureCredential());
+
+            string @namespace = configuration["AzureServiceBus:Namespace"]!;
+
+            builder.AddServiceBusClientWithNamespace(@namespace);
+            builder.AddServiceBusAdministrationClientWithNamespace(@namespace);
         });
     }
 }
