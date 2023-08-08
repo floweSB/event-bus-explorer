@@ -1,0 +1,132 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "logAnalyticsWorkspace": {
+      "type": "string",
+      "defaultValue": "log-ebe-flowesb-001",
+      "metadata": {
+        "description": "Log analytics workspace associated with the container app"
+      }
+    },
+    "containerAppEnvironment": {
+      "type": "string",
+      "defaultValue": "cae-ebe-flowesb-001",
+      "metadata": {
+        "description": "Container app Environment"
+      }
+    },
+    "containerApp": {
+      "type": "string",
+      "defaultValue": "ca-ebe-flowesb-001",
+      "metadata": {
+        "description": "Container App name"
+      }
+    },
+    "serviceBusConnectionString": {
+      "type": "string",
+      "metadata": {
+        "description": "Service Bus root connection string"
+      }
+    },
+    "revisionSuffix": {
+      "type": "string",
+      "defaultValue": "[utcNow()]"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[parameters('logAnalyticsWorkspace')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2023-04-01-preview",
+      "name": "[parameters('containerAppEnvironment')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Consumption"
+      },
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace')), '2022-10-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace')), '2022-10-01').primarySharedKey]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-04-01-preview",
+      "name": "[parameters('containerApp')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('containerAppEnvironment'))]",
+        "configuration": {
+          "ingress": {
+            "external": true,
+            "targetPort": 80,
+            "allowInsecure": false,
+            "traffic": [
+              {
+                "latestRevision": true,
+                "weight": 100
+              }
+            ]
+          },
+          "secrets": [
+            {
+              "name": "service-bus-connection-string",
+              "value": "[parameters('serviceBusConnectionString')]"
+            }
+          ]
+        },
+        "template": {
+          "revisionSuffix": "[toLower(parameters('revisionSuffix'))]",
+          "containers": [
+            {
+              "name": "[parameters('containerApp')]",
+              "image": "ghcr.io/flowesb/event-bus-explorer:latest",
+              "resources": {
+                "cpu": 0.25,
+                "memory": ".5Gi"
+              },
+              "env": [
+                {
+                  "name": "ASPNETCORE_ENVIRONMENT",
+                  "value": "Development"
+                },
+                {
+                  "name": "ConnectionStrings__ServiceBus",
+                  "secretRef": "service-bus-connection-string"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', parameters('containerAppEnvironment'))]"
+      ]
+    }
+  ]
+}
