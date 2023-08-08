@@ -1,9 +1,9 @@
 {
   "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
   "type": "QuickStart",
-  "itemDisplayName": "Create an AppService Plan and a Linux AppService",
-  "description": "This template enables you to deploy a th Event Bus Explorer on an AppService.",
-  "summary": "This template deploys an AppService Plan and a linux AppService.",
+  "itemDisplayName": "Create a Container App Environment and a Container App",
+  "description": "This template enables you to deploy the Event Bus Explorer on a Container App.",
+  "summary": "This template deploys a Container App Environment and a Container App.",
   "githubUsername": "floweSB",
-  "dateUpdated": "2023-07-31"
+  "dateUpdated": "2023-08-08"
 }
