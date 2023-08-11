@@ -120,7 +120,7 @@ public class QueuesController : ControllerBase
     /// <response code="204">No content</response>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpDelete("{queueName}/messages")]
-    public async Task<IActionResult> GetMessagesAsync(
+    public async Task<IActionResult> PurgeMessagesAsync(
         [FromRoute] string queueName,
         [FromQuery] SubQueue subQueue,
         CancellationToken cancellationToken = default)
