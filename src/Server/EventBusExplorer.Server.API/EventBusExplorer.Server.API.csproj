@@ -5,8 +5,6 @@
     <AssemblyName>EventBusExplorer.Server.API</AssemblyName>
     <RootNamespace>EventBusExplorer.Server.API</RootNamespace>
     <UserSecretsId>910a84aa-22ea-428d-94c4-ba28e6e7c28e</UserSecretsId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
