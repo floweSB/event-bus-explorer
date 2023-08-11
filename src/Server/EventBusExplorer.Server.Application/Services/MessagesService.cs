@@ -78,6 +78,45 @@ internal class MessagesService : IMessagesService
 
         return new GetMessagesResponse(dtos);
     }
+
+    public async Task PurgeMessagesAsync(
+        string topicName,
+        string subscriptionName,
+        SubQueue subQueue,
+        CancellationToken cancellationToken = default)
+    {
+        var task = subQueue switch
+        {
+            SubQueue.Active =>
+                _topicsService.PurgeMessagesAsync(topicName, subscriptionName, cancellationToken),
+
+            SubQueue.DeadLetter =>
+                _topicsService.PurgeDeadLetterMessagesAsync(topicName, subscriptionName, cancellationToken),
+
+            _ => throw new NotImplementedException($"Unknown subqueue: {subQueue}"),
+        };
+
+        await task;
+    }
+
+    public async Task PurgeMessagesAsync(
+    string queueName,
+    SubQueue subQueue,
+    CancellationToken cancellationToken = default)
+    {
+        var task = subQueue switch
+        {
+            SubQueue.Active =>
+                _queuesService.PurgeMessagesAsync(queueName, cancellationToken),
+
+            SubQueue.DeadLetter =>
+                _queuesService.PurgeDeadLetterMessagesAsync(queueName, cancellationToken),
+
+            _ => throw new NotImplementedException($"Unknown subqueue: {subQueue}"),
+        };
+
+        await task;
+    }
 }
 
 public interface IMessagesService
@@ -110,5 +149,29 @@ public interface IMessagesService
         string subscriptionName,
         QuerySettings querySettings,
         long? fromSequenceNumber = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Purge a queue
+    /// </summary>
+    /// <param name="queueName">Queue name</param>
+    /// <param name="subQueue">Sub queue to query</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task PurgeMessagesAsync(
+        string queueName,
+        SubQueue subQueue,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Purge a topic subscription
+    /// </summary>
+    /// <param name="topicName">Topic name</param>
+    /// <param name="subscriptionName">Topic subscription name</param>
+    /// <param name="subQueue">Sub queue to query</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task PurgeMessagesAsync(
+        string topicName,
+        string subscriptionName,
+        SubQueue subQueue,
         CancellationToken cancellationToken = default);
 }

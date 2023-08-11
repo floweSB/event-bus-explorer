@@ -121,4 +121,26 @@ public interface IServiceBrokerTopicsService
         string topicName,
         string susbcriptionName,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Purge topic subscription
+    /// </summary>
+    /// <param name="topicName">Name of the topic to purge</param>
+    /// <param name="subscriptionName">Name of the topic subscription to purge</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task PurgeMessagesAsync(
+        string topicName,
+        string subscriptionName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Purge dead letter topic subscription
+    /// </summary>
+    /// <param name="topicName">Name of the topic to purge</param>
+    /// <param name="subscriptionName">Name of the topic subscription to purge</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task PurgeDeadLetterMessagesAsync(
+        string topicName,
+        string subscriptionName,
+        CancellationToken cancellationToken = default);
 }

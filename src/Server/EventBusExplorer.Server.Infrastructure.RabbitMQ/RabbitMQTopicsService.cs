@@ -101,4 +101,14 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
     {
         throw new NotImplementedException();
     }
+
+    public Task PurgeMessagesAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task PurgeDeadLetterMessagesAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }

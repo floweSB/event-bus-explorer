@@ -78,4 +78,22 @@ public interface IServiceBrokerQueuesService
     Task<MessageList> ReceiveDeadLetterMessagesAsync(
         string queueName,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Purge queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to purge</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task PurgeMessagesAsync(
+        string queueName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Purge dead letter queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to purge</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    Task PurgeDeadLetterMessagesAsync(
+        string queueName,
+        CancellationToken cancellationToken = default);
 }
