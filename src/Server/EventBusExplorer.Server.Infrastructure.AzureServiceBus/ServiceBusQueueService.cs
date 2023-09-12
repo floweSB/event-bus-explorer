@@ -125,12 +125,62 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
         return new MessageList(toReturn);
     }
 
-    private ServiceBusReceiver GetReceiver(string name) =>
-        _client.CreateReceiver(name);
+    /// <summary>
+    /// Purge queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to purge</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    public async Task PurgeMessagesAsync(
+        string queueName,
+        CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
 
-    private ServiceBusReceiver GetDeadLetterReceiver(string name) =>
+        var receiver = GetReceiver(queueName, ServiceBusReceiveMode.ReceiveAndDelete);
+
+        bool hasMoreMessages = true;
+
+        while (hasMoreMessages)
+        {
+            IReadOnlyList<ServiceBusReceivedMessage> receivedMessages = await receiver.ReceiveMessagesAsync(MAX_COUNT, TimeSpan.FromSeconds(1), cancellationToken);
+
+            hasMoreMessages = receivedMessages.Any();
+        }
+    }
+
+    /// <summary>
+    /// Purge dead letter queue
+    /// </summary>
+    /// <param name="queueName">Name of the queue to purge</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    public async Task PurgeDeadLetterMessagesAsync(
+        string queueName,
+        CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
+
+        var receiver = GetDeadLetterReceiver(queueName, ServiceBusReceiveMode.ReceiveAndDelete);
+
+        bool hasMoreMessages = true;
+
+        while (hasMoreMessages)
+        {
+            IReadOnlyList<ServiceBusReceivedMessage> receivedMessages = await receiver.ReceiveMessagesAsync(MAX_COUNT, TimeSpan.FromSeconds(1), cancellationToken);
+
+            hasMoreMessages = receivedMessages.Any();
+        }
+    }
+
+    private ServiceBusReceiver GetReceiver(string name, ServiceBusReceiveMode receiveMode = ServiceBusReceiveMode.PeekLock) =>
         _client.CreateReceiver(name, new ServiceBusReceiverOptions
         {
-            SubQueue = SubQueue.DeadLetter
+            ReceiveMode = receiveMode,
+        });
+
+    private ServiceBusReceiver GetDeadLetterReceiver(string name, ServiceBusReceiveMode receiveMode = ServiceBusReceiveMode.PeekLock) =>
+        _client.CreateReceiver(name, new ServiceBusReceiverOptions
+        {
+            SubQueue = SubQueue.DeadLetter,
+            ReceiveMode = receiveMode,
         });
 }

@@ -110,4 +110,23 @@ public class QueuesController : ControllerBase
 
         return Ok(dto);
     }
+
+    /// <summary>
+    /// Purge messages in queue
+    /// </summary>
+    /// <param name="queueName">Queue name</param>
+    /// <param name="subQueue">Sub queue to query</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <response code="204">No content</response>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpDelete("{queueName}/messages")]
+    public async Task<IActionResult> PurgeMessagesAsync(
+        [FromRoute] string queueName,
+        [FromQuery] SubQueue subQueue,
+        CancellationToken cancellationToken = default)
+    {
+        await _messagesService.PurgeMessagesAsync(queueName, subQueue, cancellationToken);
+
+        return NoContent();
+    }
 }

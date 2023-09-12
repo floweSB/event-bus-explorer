@@ -174,4 +174,25 @@ public class TopicsController : ControllerBase
 
         return Ok(dto);
     }
+
+    /// <summary>
+    /// Purge messages in topic subscription
+    /// </summary>
+    /// <param name="topicName">Topic name</param>
+    /// <param name="subscriptionName">Topic subscription name</param>
+    /// <param name="subQueue">Sub queue to query</param>
+    /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
+    /// <response code="204">No content</response>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpDelete("{topicName}/subscriptions/{subscriptionName}/messages")]
+    public async Task<IActionResult> PurgeMessagesAsync(
+        [FromRoute] string topicName,
+        [FromRoute] string subscriptionName,
+        [FromQuery] SubQueue subQueue,
+        CancellationToken cancellationToken = default)
+    {
+        await _messagesService.PurgeMessagesAsync(topicName, subscriptionName, subQueue, cancellationToken);
+
+        return NoContent();
+    }
 }

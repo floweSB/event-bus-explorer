@@ -82,13 +82,13 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
 
     public async Task<MessageList> PeekMessagesAsync(
         string topicName,
-        string susbcriptionName,
+        string subscriptionName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
     {
         const int MAX_COUNT = 50;
 
-        var receiver = GetReceiver(topicName, susbcriptionName);
+        var receiver = GetReceiver(topicName, subscriptionName);
 
         IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.PeekMessagesAsync(
             MAX_COUNT,
@@ -103,13 +103,13 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
 
     public async Task<MessageList> PeekDeadLetterMessagesAsync(
         string topicName,
-        string susbcriptionName,
+        string subscriptionName,
         long? fromSequenceNumber = null,
         CancellationToken cancellationToken = default)
     {
         const int MAX_COUNT = 50;
 
-        var receiver = GetDeadLetterReceiver(topicName, susbcriptionName);
+        var receiver = GetDeadLetterReceiver(topicName, subscriptionName);
 
         IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.PeekMessagesAsync(
             MAX_COUNT,
@@ -124,12 +124,12 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
 
     public async Task<MessageList> ReceiveMessagesAsync(
         string topicName,
-        string susbcriptionName,
+        string subscriptionName,
         CancellationToken cancellationToken = default)
     {
         const int MAX_COUNT = 50;
 
-        var receiver = GetReceiver(topicName, susbcriptionName);
+        var receiver = GetReceiver(topicName, subscriptionName);
 
         IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.ReceiveMessagesAsync(
             MAX_COUNT,
@@ -144,12 +144,12 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
 
     public async Task<MessageList> ReceiveDeadLetterMessagesAsync(
         string topicName,
-        string susbcriptionName,
+        string subscriptionName,
         CancellationToken cancellationToken = default)
     {
         const int MAX_COUNT = 50;
 
-        var receiver = GetDeadLetterReceiver(topicName, susbcriptionName);
+        var receiver = GetDeadLetterReceiver(topicName, subscriptionName);
 
         IReadOnlyList<ServiceBusReceivedMessage> messages = await receiver.ReceiveMessagesAsync(
             MAX_COUNT,
@@ -162,12 +162,60 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
         return new MessageList(toReturn);
     }
 
-    private ServiceBusReceiver GetReceiver(string topicName, string subscriptionName) =>
-        _client.CreateReceiver(topicName, subscriptionName);
+    public async Task PurgeMessagesAsync(
+        string topicName,
+        string subscriptionName,
+        CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
 
-    private ServiceBusReceiver GetDeadLetterReceiver(string topicName, string subscriptionName) =>
-        _client.CreateReceiver(topicName, subscriptionName, new ServiceBusReceiverOptions
+        var receiver = GetReceiver(topicName, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete);
+
+        bool hasMoreMessages = true;
+
+        while (hasMoreMessages)
         {
-            SubQueue = SubQueue.DeadLetter
-        });
+            IReadOnlyList<ServiceBusReceivedMessage> receivedMessages = await receiver.ReceiveMessagesAsync(MAX_COUNT, TimeSpan.FromSeconds(1), cancellationToken);
+
+            hasMoreMessages = receivedMessages.Any();
+        }
+    }
+
+    public async Task PurgeDeadLetterMessagesAsync(
+        string topicName,
+        string subscriptionName,
+        CancellationToken cancellationToken = default)
+    {
+        const int MAX_COUNT = 50;
+
+        var receiver = GetDeadLetterReceiver(topicName, subscriptionName, ServiceBusReceiveMode.ReceiveAndDelete);
+
+        bool hasMoreMessages = true;
+
+        while (hasMoreMessages)
+        {
+            IReadOnlyList<ServiceBusReceivedMessage> receivedMessages = await receiver.ReceiveMessagesAsync(MAX_COUNT, TimeSpan.FromSeconds(1), cancellationToken);
+
+            hasMoreMessages = receivedMessages.Any();
+        }
+    }
+
+    private ServiceBusReceiver GetReceiver(
+        string topicName,
+        string subscriptionName,
+        ServiceBusReceiveMode receiveMode = ServiceBusReceiveMode.PeekLock) =>
+            _client.CreateReceiver(topicName, subscriptionName, new ServiceBusReceiverOptions
+            {
+                ReceiveMode = receiveMode,
+            });
+
+    private ServiceBusReceiver GetDeadLetterReceiver(
+        string topicName,
+        string subscriptionName,
+        ServiceBusReceiveMode receiveMode = ServiceBusReceiveMode.PeekLock) =>
+            _client.CreateReceiver(topicName, subscriptionName, new ServiceBusReceiverOptions
+            {
+                SubQueue = SubQueue.DeadLetter,
+                ReceiveMode = receiveMode,
+            });
 }
