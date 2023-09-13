@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -7,16 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\EventBusExplorer.Server.Application.ServiceBroker.Abstractions\EventBusExplorer.Server.Application.ServiceBroker.Abstractions.csproj" />
+    <ProjectReference Include="..\EventBusExplorer.Server.Application.ServiceBroker.Abstractions\EventBusExplorer.Server.Application.ServiceBroker.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"
-      Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
   </ItemGroup>
 
 </Project>

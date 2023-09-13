@@ -13,12 +13,12 @@ internal class ServiceBusTopicsService : IServiceBrokerTopicsService
 
     public ServiceBusTopicsService(
         ServiceBusClient client,
-        ServiceBusAdministrationClient adminClient)
+        Func<string, ServiceBusAdministrationClient> adminClient)
     {
         _client = client ??
             throw new ArgumentNullException(nameof(client));
 
-        _adminClient = adminClient ??
+        _adminClient = adminClient.Invoke("Platform") ??
             throw new ArgumentNullException(nameof(adminClient));
     }
 
