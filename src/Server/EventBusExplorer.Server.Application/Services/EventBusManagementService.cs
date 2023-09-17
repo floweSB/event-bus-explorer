@@ -1,4 +1,4 @@
-using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
+﻿using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 
 namespace EventBusExplorer.Server.Application;
 
@@ -36,11 +36,11 @@ internal class EventBusManagementService : IEventBusManagementService
     public Task DeleteTopicSubscriptionAsync(string topicName, string subscriptionName, CancellationToken cancellationToken = default) =>
         _topicsService.DeleteSubscriptionAsync(topicName, subscriptionName, cancellationToken);
 
-    public Task<string> GetQueueAsync(string name, CancellationToken cancellationToken = default) =>
-        _queuesService.GetAsync(name, cancellationToken);
+    public Task<string> GetQueueAsync(string eventBusName, string name, CancellationToken cancellationToken = default) =>
+        _queuesService.GetAsync(eventBusName, name, cancellationToken);
 
-    public Task<IList<string>> GetQueuesAsync(CancellationToken cancellationToken = default) =>
-        _queuesService.GetAsync(cancellationToken);
+    public Task<IList<string>> GetQueuesAsync(string busName, CancellationToken cancellationToken = default) =>
+        _queuesService.GetAsync(busName, cancellationToken);
 
     public Task<string> GetTopicAsync(string name, CancellationToken cancellationToken = default) =>
         _topicsService.GetTopicAsync(name, cancellationToken);
@@ -68,17 +68,19 @@ public interface IEventBusManagementService
     /// <summary>
     /// Get list of queues
     /// </summary>
+    /// <param name="busName">Event bus name</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>List of topics</returns>
-    Task<IList<string>> GetQueuesAsync(CancellationToken cancellationToken = default);
+    Task<IList<string>> GetQueuesAsync(string busName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get details of the given queue
     /// </summary>
+    /// <param name="eventBusName">Event bus name</param>
     /// <param name="name">Queue name</param>
     /// <param name="cancellationToken">(Optional) Cancellation token to cancel the operation</param>
     /// <returns>Name of the queue</returns>
-    Task<string> GetQueueAsync(string name, CancellationToken cancellationToken = default);
+    Task<string> GetQueueAsync(string eventBusName, string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Delete the specified queue

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
+using EventBusExplorer.Server.API.Middlewares;
 using EventBusExplorer.Server.Application;
 using EventBusExplorer.Server.Infrastructure.AzureServiceBus;
 using Microsoft.AspNetCore.Diagnostics;
@@ -51,8 +52,9 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 
-WebApplication app = builder.Build();
+builder.Services.AddTransient<HeaderValidatorMiddleware>();
 
+WebApplication app = builder.Build();
 
 // Log unhandled exceptions and return 500 without info leaks.
 app.UseExceptionHandler(exceptionHandlerApp =>
@@ -81,6 +83,8 @@ app.UseExceptionHandler(exceptionHandlerApp =>
     });
 });
 
+app.UseHeaderValidator();
+
 if (builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -99,6 +103,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
 
 //TODO: remove this
 #pragma warning enable

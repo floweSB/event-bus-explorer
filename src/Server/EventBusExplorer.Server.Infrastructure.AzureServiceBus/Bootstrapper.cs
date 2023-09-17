@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using System.Collections.ObjectModel;
+using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using EventBusExplorer.Server.Application.ServiceBroker.Abstractions;
 using Microsoft.Extensions.Azure;
@@ -27,52 +28,61 @@ public static class Bootstrapper
 
     private static void SetupServiceBus(IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<AzureServiceBusSettings>(configuration.GetSection("ConnectionStrings")!);
+        services.Configure<EventBusSettings>(configuration.GetSection("ConnectionStrings:EventBus")!);
 
         services.AddAzureClients(builder =>
         {
-            //Func<string, string> GetConnectionString(IServiceProvider sp, string key)
-            //{
-            //    var config = sp.GetRequiredService<IOptions<AzureServiceBusSettings>>();
-            //    var dict = config.Value.AzureServiceBus;
-
-            //    return (key) =>
-            //    {
-            //        return dict[key]!;
-            //    };
-            //}
-
             builder.AddClient<Func<string, ServiceBusClient>, ServiceBusClientOptions>((options, _, sp) =>
             {
-                var config = sp.GetRequiredService<IOptions<AzureServiceBusSettings>>();
+                var config = sp.GetRequiredService<IOptions<EventBusSettings>>();
                 var dict = config.Value.AzureServiceBus;
 
                 return (key) =>
                 {
-                    var cs = dict[key]!;
+                    var isFound = dict.TryGetValue(key, out string cs);
+                    if (!isFound)
+                    {
+                        if (dict.Count == 1)
+                        {
+                            cs = dict.FirstOrDefault().Value;
+                        }
+                    }
+
                     return new ServiceBusClient(cs);
                 };
             });
 
             builder.AddClient<Func<string, ServiceBusAdministrationClient>, ServiceBusClientOptions>((options, _, sp) =>
             {
-                var config = sp.GetRequiredService<IOptions<AzureServiceBusSettings>>();
+                var config = sp.GetRequiredService<IOptions<EventBusSettings>>();
                 var dict = config.Value.AzureServiceBus;
 
                 return (key) =>
                 {
-                    var cs = dict[key]!;
+                    var isFound = dict.TryGetValue(key, out string cs);
+                    if (!isFound)
+                    {
+                        if (dict.Count == 1)
+                        {
+                            cs = dict.FirstOrDefault().Value;
+                        }
+                    }
+
                     return new ServiceBusAdministrationClient(cs);
                 };
             });
-
-            //builder.AddServiceBusAdministrationClient(connectionString);
-            //builder.AddServiceBusClient(connectionString);
         });
     }
 }
 
-public class AzureServiceBusSettings
+public class EventBusSettings
 {
-    public Dictionary<string, string> AzureServiceBus { get; init; } = new Dictionary<string, string>();
+    public IDictionary<string, string> AzureServiceBus { get; init; } = new Dictionary<string, string>();
+
+    public ReadOnlyCollection<string> ServiceBusNames =>
+        AzureServiceBus
+            .Keys
+            .OrderBy(x => x)
+            .ToList()
+            .AsReadOnly();
 }
