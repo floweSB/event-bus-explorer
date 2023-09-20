@@ -11,15 +11,21 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
     private readonly ServiceBusAdministrationClient _adminClient;
     private readonly ServiceBusClient _client;
 
+    private readonly Func<string, ServiceBusClient> _clientDelegate;
+    private readonly Func<string, ServiceBusAdministrationClient> _adminClientDelegate;
+
     public ServiceBusQueuesService(
-        ServiceBusClient client,
-        ServiceBusAdministrationClient adminClient)
+        Func<string, ServiceBusClient> client,
+        Func<string, ServiceBusAdministrationClient> adminClient)
     {
-        _client = client ??
+        _client = client.Invoke("Platform") ??
             throw new ArgumentNullException(nameof(client));
 
-        _adminClient = adminClient ??
+        _adminClient = adminClient.Invoke("Platform") ??
             throw new ArgumentNullException(nameof(adminClient));
+
+        _clientDelegate = client;
+        _adminClientDelegate = adminClient;
     }
 
     public async Task<string> CreateAsync(string? name, CancellationToken cancellationToken = default)
@@ -33,10 +39,12 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
         await _adminClient.DeleteQueueAsync(name, cancellationToken);
     }
 
-    public async Task<IList<string>> GetAsync(CancellationToken cancellationToken = default)
+    public async Task<IList<string>> GetAsync(string eventBusName, CancellationToken cancellationToken = default)
     {
+        var adminClient = _adminClientDelegate.Invoke(eventBusName);
+
         List<string> queues = new();
-        AsyncPageable<QueueProperties> queuesProperties = _adminClient.GetQueuesAsync(cancellationToken);
+        AsyncPageable<QueueProperties> queuesProperties = adminClient.GetQueuesAsync(cancellationToken);
         await foreach (QueueProperties queueProperties in queuesProperties)
         {
             queues.Add(queueProperties.Name);
@@ -45,9 +53,11 @@ internal class ServiceBusQueuesService : IServiceBrokerQueuesService
         return queues;
     }
 
-    public async Task<string> GetAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<string> GetAsync(string eventBusName, string name, CancellationToken cancellationToken = default)
     {
-        QueueProperties queueProperties = await _adminClient.GetQueueAsync(name, cancellationToken);
+        var adminClient = _adminClientDelegate.Invoke(eventBusName);
+
+        QueueProperties queueProperties = await adminClient.GetQueueAsync(name, cancellationToken);
         return queueProperties.Name;
     }
 

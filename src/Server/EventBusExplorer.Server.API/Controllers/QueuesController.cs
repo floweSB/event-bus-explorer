@@ -30,12 +30,14 @@ public class QueuesController : ControllerBase
     /// <summary>
     /// Get list of queues
     /// </summary>
+    /// <param name="busName">Event Bus name</param> 
     /// <response code="200">Returns the list of queue names</response>
     [ProducesResponseType(typeof(GetQueuesResponse), StatusCodes.Status200OK)]
     [HttpGet]
-    public async Task<IActionResult> GetAsync()
+    public async Task<IActionResult> GetAsync([FromHeader(Name = "x-bus")] string? busName)
     {
-        IList<string> queueNames = await _eventBusManagementService.GetQueuesAsync();
+        busName ??= string.Empty;
+        IList<string> queueNames = await _eventBusManagementService.GetQueuesAsync(busName!);
         GetQueuesResponse response = new(queueNames);
 
         return Ok(response);
@@ -44,13 +46,15 @@ public class QueuesController : ControllerBase
     /// <summary>
     /// Get details of the given queue
     /// </summary>
+    /// <param name="busName">Event Bus name</param>
     /// <param name="name">Queue name</param>
     /// <response code="200">Return details of the given queue</response>
     [ProducesResponseType(typeof(GetQueueResponse), StatusCodes.Status200OK)]
     [HttpGet("{name}")]
-    public async Task<IActionResult> GetAsync([FromRoute] string name)
+    public async Task<IActionResult> GetAsync([FromHeader(Name = "x-bus")] string? busName, [FromRoute] string name)
     {
-        string queueName = await _eventBusManagementService.GetQueueAsync(name);
+        busName ??= string.Empty;
+        string queueName = await _eventBusManagementService.GetQueueAsync(busName, name);
         GetQueueResponse response = new(queueName);
         return Ok(response);
     }
