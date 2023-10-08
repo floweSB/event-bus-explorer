@@ -15,8 +15,9 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
 
     public async Task<string> CreateTopicAsync(string? name, CancellationToken cancellationToken = default)
     {
-        await _adminClient.CreateTopicAsync(
+        await _adminClient.CreateExchangeAsync(
             name,
+            type: ExchangeType.Topic,
             cancellationToken: cancellationToken);
 
         //
@@ -28,24 +29,29 @@ public class RabbitMQTopicsService : IServiceBrokerTopicsService
 
     public async Task<IList<string>> GetTopicsAsync(CancellationToken cancellationToken = default)
     {
-        IList<ExchangeTopic> topics = await _adminClient.GetTopicsAsync(
+        IList<Exchange> topicExchanges = await _adminClient.GetExchangesAsync(
+            type: ExchangeType.Topic,
             cancellationToken: cancellationToken);
 
-        return topics.Select(x => x.Name).ToList();
+        return topicExchanges.Select(x => x.Name).ToList();
     }
 
     public async Task<string> GetTopicAsync(string name, CancellationToken cancellationToken = default)
     {
-        ExchangeTopic topic = await _adminClient.GetTopicAsync(
+        Exchange? topic = await _adminClient.GetExchangeAsync(
             name,
+            type: ExchangeType.Topic,
             cancellationToken: cancellationToken);
+
+        if (topic is null)
+            throw new Exception($"Cannot find exchange with name: {name}"); //TODO: define or find a suitable exc type
 
         return topic.Name;
     }
 
     public async Task DeleteTopicAsync(string name, CancellationToken cancellationToken = default)
     {
-        await _adminClient.DeleteTopicAsync(name, cancellationToken: cancellationToken);
+        await _adminClient.DeleteExchangeAsync(name, cancellationToken: cancellationToken);
     }
 
     public Task<IList<string>> GetSubscriptionsAsync(string topicName, CancellationToken cancellationToken = default)
